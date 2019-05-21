@@ -38,6 +38,7 @@ Private valid As Validator
 
 
 Private theCorail As ICorail
+Private theCorailData As ICorailData
 Private theLayout As ILayout
 
 
@@ -52,7 +53,7 @@ Private httpReq As HTTPRequestHandler
 
 Private Sub Class_Initialize()
     Set valid = New Validator
-    Set httpReq = Nothing
+    Set httpReq = New HTTPRequestHandler
     Set theCorail = New Corail
 End Sub
 
@@ -61,6 +62,7 @@ Private Sub Class_Terminate()
     Set httpReq = Nothing
     Set theCorail = Nothing
 End Sub
+
 
 Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
 
@@ -73,7 +75,7 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
 
     ' new rep
     Set repWorksheet = ThisWorkbook.Sheets.Add
-    repworkhsheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
+    repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
     Set repCell = repWorksheet.Cells(2, 1)
 
 
@@ -88,7 +90,7 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
         makeInteration inputRef
     
         Set inputRef = inputRef.Offset(1, 0)
-    Loop While Trim(inputRef) = ""
+    Loop Until Trim(inputRef) = ""
     
     
 End Sub
@@ -101,12 +103,27 @@ Private Sub makeInteration(ByRef inputRef As Range)
 
     Dim plt As String
     Dim pn As String
+    Dim fso As New FSOHandler
     
     plt = CStr(inputRef.Value)
     pn = CStr(inputRef.Offset(0, 1).Value)
     
-    If theCorail.connectWithScreen() Then
-        ' theCorail.getDataFromScreen( 2720, plt, pn )
+    If httpReq.usable() Then
+        
+        theCorail.connectWithHttpReq httpReq
+    
+        If theCorail.connectWithScreen(2720) Then
+            Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
+            fso.makeHtmlFile "t2720_" & plt & "_" & pn, theCorailData.getString()
+            
+            
+            Set theCorailData = theCorail.getDataFromScreen(2510, plt, pn)
+            fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
+        End If
+    Else
+        MsgBox "Fatal error during http connection!", vbExclamation
+        End
+    End If
 
 End Sub
 ' ===========================================================================

@@ -34,18 +34,45 @@ Implements ICorailData
 
 
 
-Private Sub Class_Initialize()
+Private rawString As String
+Private theDomHandler As DOMHandler
+Private theParser As IParser
 
+Private Sub Class_Initialize()
+    rawString = ""
+    Set theDomHandler = New DOMHandler
+    Set theParser = New Parser
 End Sub
 
 Private Sub Class_Terminate()
-
+    rawString = ""
+    Set theDomHandler = Nothing
+    Set theParser = Nothing
 End Sub
 
 Private Function ICorailData_getString() As String
-
+    ICorailData_getString = CStr(rawString)
 End Function
 
-Private Sub ICorailData_setString(arg As String)
+Private Sub ICorailData_parseString()
 
+
+    ' we're inside parsing
+    ' ========================================
+    Debug.Print "parseString... "
+    ' Debug.Print rawString
+    ' ========================================
+
+End Sub
+
+Private Sub ICorailData_setString(arg As String)
+    rawString = arg
+    
+    With theDomHandler
+        Set .doc = New HTMLDocument
+        Set .idoc = New HTMLDocument
+        .doc.body.innerHTML = arg
+        .idoc.body.innerHTML = .doc.body.innerHTML
+    End With
+    
 End Sub

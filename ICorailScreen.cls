@@ -33,7 +33,7 @@ Attribute VB_Exposed = False
 
 
 
-Public Sub screenSetup(number)
+Public Sub screenSetup(number, httpReq As HTTPRequestHandler)
 End Sub
 
 Public Function openData(plt, partNumber) As Boolean

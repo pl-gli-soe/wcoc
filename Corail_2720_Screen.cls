@@ -35,22 +35,72 @@ Attribute VB_Exposed = False
 Implements ICorailScreen
 
 
+Private num As Integer
+
+
+Private preUrl As String
+Private screenUrl As String
+Private url As String
+
+Private req As HTTPRequestHandler
+
+Private theCorailData As ICorailData
+
+Private valid As Validator
+
+
 Private Sub Class_Initialize()
 
+    num = 2720
+
+    screenUrl = "/getProductSummaryRead.do?beanId="
+    preUrl = ".control.erp.corail.inetpsa.com"
+    url = ""
+    Set req = Nothing
+    
+    Set valid = New Validator
 End Sub
 
 Private Sub Class_Terminate()
 
+    preUrl = ""
+    screenUrl = ""
+    url = ""
+
+    Set req = Nothing
+    
+    Set valid = Nothing
 End Sub
 
 Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant) As ICorailData
 
+    ' -----------------------------------------------------------------------------
+    url = "http://" & CStr(plt) & preUrl & screenUrl & CStr(partNumber)
+    
+    Dim answer As String
+    answer = req.httpGet(url)
+    
+    If valid.checkAnswer(num, answer) Then
+        Set theCorailData = New CorailData
+        theCorailData.setString answer
+        theCorailData.parseString
+    Else
+        Set theCorailData = Nothing
+    End If
+    
+    
+    Set ICorailScreen_getData = theCorailData
+    
+    ' -----------------------------------------------------------------------------
+    
 End Function
 
 Private Function ICorailScreen_openData(plt As Variant, partNumber As Variant) As Boolean
-
+    ICorailScreen_openData = False
 End Function
 
-Private Sub ICorailScreen_screenSetup(number As Variant)
+Private Sub ICorailScreen_screenSetup(number As Variant, httpReq As HTTPRequestHandler)
+
+    Set req = httpReq
 
 End Sub

@@ -72,6 +72,26 @@ Public Function httpGet(url) As String
 End Function
 
 
+Public Function httpPost(url, args) As String
+
+    With request
+        .Open "POST", url, False
+        .setRequestHeader "Accept", "*/*"
+        .setRequestHeader "Origin", "http://sx.control.erp.corail.inetpsa.com"
+        .setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+        .SetAutoLogonPolicy AutoLogonPolicy_Always
+        .SetCredentials login, pass, 0
+        .send args
+        .WaitForResponse
+        
+        httpPost = CStr(.responseText)
+    End With
+End Function
+
+
+
+
+
 
 
 ' constructor and deconstructor

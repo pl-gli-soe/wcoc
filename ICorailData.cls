@@ -41,3 +41,7 @@ Public Sub setString(arg As String)
 End Sub
 
 
+Public Sub parseString()
+End Sub
+
+

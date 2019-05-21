@@ -17,6 +17,8 @@ Attribute VB_Name = "ExportThisProjectMod"
 ' IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 ' WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ' OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
 Global Const REPO_PATH = "C:\WORKSPACE\macros\coverage\wcoc\repo\"
 
 Private Sub export_this_project()
@@ -62,7 +64,7 @@ Private Sub import_this_project()
     
     
     Dim objFSO As Scripting.FileSystemObject
-    Dim objFile As Scripting.File
+    Dim objFile As Scripting.file
     Set objFSO = New Scripting.FileSystemObject
     
     Dim VBProj As VBIDE.VBProject

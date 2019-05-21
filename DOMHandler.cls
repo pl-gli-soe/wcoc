@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Validator"
+Attribute VB_Name = "DOMHandler"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
-' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
+' Mateusz Milewski mateusz.milewski@opel.com aka FORREST
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -32,35 +32,23 @@ Attribute VB_Exposed = False
 
 
 
-Public Function makeSomeValidationOnImportedPackage(pckg As ICorailData) As Boolean
-    makeSomeValidationOnImportedPackage = False
-    
-    
-    If pckg Is Nothing Then
-        makeSomeValidationOnImportedPackage = False
-    Else
-        makeSomeValidationOnImportedPackage = True
-    End If
-End Function
+
+Public i As HTMLInputElement
+
+Public inputButton As HTMLInputButtonElement
+Public button As HTMLButtonElement
+
+Public a As HTMLAnchorElement
+Public s As HTMLSelectElement
+
+Public elementCollection As HTMLElementCollection
+Public iElementCollection As IHTMLElementCollection
+
+Public idoc As IHTMLDocument
+Public doc As HTMLDocument
+
+Public iElement As IHTMLElement
+Public table As HTMLTable
 
 
-Public Function checkIfThereIsAInputList(sh As Worksheet) As Boolean
-    checkIfThereIsAInputList = False
-    
 
-    ' for now - really simple!
-    If Trim(sh.Range("A2")) <> "" And Trim(sh.Range("B2")) <> "" Then
-        ' at least one record is ok
-        checkIfThereIsAInputList = True
-    End If
-End Function
-
-
-Public Function checkAnswer(scrNum, answer) As Boolean
-    
-    checkAnswer = False
-    
-    
-    ' narazie bez validacji - przepusc bezproblemowo
-    checkAnswer = True
-End Function

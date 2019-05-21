@@ -1,12 +1,4 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "Validator"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Name = "mainModule"
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
@@ -30,37 +22,12 @@ Attribute VB_Exposed = False
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
 
-
-
-Public Function makeSomeValidationOnImportedPackage(pckg As ICorailData) As Boolean
-    makeSomeValidationOnImportedPackage = False
+Public Sub main()
     
+    Dim cov As ICoverage
     
-    If pckg Is Nothing Then
-        makeSomeValidationOnImportedPackage = False
-    Else
-        makeSomeValidationOnImportedPackage = True
-    End If
-End Function
-
-
-Public Function checkIfThereIsAInputList(sh As Worksheet) As Boolean
-    checkIfThereIsAInputList = False
+    Set cov = New WeeklyCoverage
+    cov.runCoverage "ofzq0l2", "br3wcz7k"
     
-
-    ' for now - really simple!
-    If Trim(sh.Range("A2")) <> "" And Trim(sh.Range("B2")) <> "" Then
-        ' at least one record is ok
-        checkIfThereIsAInputList = True
-    End If
-End Function
-
-
-Public Function checkAnswer(scrNum, answer) As Boolean
-    
-    checkAnswer = False
-    
-    
-    ' narazie bez validacji - przepusc bezproblemowo
-    checkAnswer = True
-End Function
+    MsgBox "ready!"
+End Sub

@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "Validator"
+Attribute VB_Name = "FSOHandler"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -31,36 +31,24 @@ Attribute VB_Exposed = False
 'SOFTWARE.
 
 
+Private fso As Object
+Private pth As String
 
-Public Function makeSomeValidationOnImportedPackage(pckg As ICorailData) As Boolean
-    makeSomeValidationOnImportedPackage = False
+Private Sub Class_Initialize()
+    Set fso = CreateObject("Scripting.FileSystemObject")
     
-    
-    If pckg Is Nothing Then
-        makeSomeValidationOnImportedPackage = False
-    Else
-        makeSomeValidationOnImportedPackage = True
-    End If
-End Function
+    pth = "C:\Temp\"
+End Sub
 
+Private Sub Class_Terminate()
+    Set fso = Nothing
+    pth = ""
+End Sub
 
-Public Function checkIfThereIsAInputList(sh As Worksheet) As Boolean
-    checkIfThereIsAInputList = False
-    
+Public Sub makeHtmlFile(filename As String, txt As String)
 
-    ' for now - really simple!
-    If Trim(sh.Range("A2")) <> "" And Trim(sh.Range("B2")) <> "" Then
-        ' at least one record is ok
-        checkIfThereIsAInputList = True
-    End If
-End Function
-
-
-Public Function checkAnswer(scrNum, answer) As Boolean
-    
-    checkAnswer = False
-    
-    
-    ' narazie bez validacji - przepusc bezproblemowo
-    checkAnswer = True
-End Function
+    Dim myFile As Object
+    Set myFile = fso.CreateTextFile("" & pth & filename & ".html", True, True)
+    myFile.Write txt
+    myFile.Close
+End Sub

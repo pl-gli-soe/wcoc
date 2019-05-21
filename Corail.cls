@@ -38,35 +38,48 @@ Private scr2720 As ICorailScreen
 Private scr2510 As ICorailScreen
 Private httpReqRef As HTTPRequestHandler
 
+Private theCorailData As ICorailData
 
 
 
 Private Sub Class_Initialize()
     Set scr2720 = New Corail_2720_Screen
     Set scr2510 = New Corail_2510_Screen
-    
-    
     Set httpReqRef = Nothing
+    Set theCorailData = New CorailData
 End Sub
 
 Private Sub Class_Terminate()
     Set scr2720 = Nothing
     Set scr2510 = Nothing
     
-    
     Set httpReqRef = Nothing
+    Set theCorailData = Nothing
 End Sub
 
 Private Function ICorail_connectWithHttpReq(httpReq As HTTPRequestHandler) As Boolean
+
     ' =========================================
     Set httpReqRef = httpReq
     ' =========================================
+    
 End Function
 
 Private Function ICorail_connectWithScreen(numberOfScreen As Variant) As Boolean
-
+    If numerOfScreen = 2510 Or numberOfScreen = 2720 Then
+        ICorail_connectWithScreen = True
+    Else
+        ICorail_connectWithScreen = False
+    End If
 End Function
 
 Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As Variant, partNumber As Variant) As ICorailData
 
+    If numberOfScreen = 2720 Then
+        scr2720.screenSetup numberOfScreen, httpReqRef
+        Set ICorail_getDataFromScreen = scr2720.getData(pltCode, partNumber)
+    ElseIf numberOfScreen = 2510 Then
+        scr2510.screenSetup numberOfScreen, httpReqRef
+        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber)
+    End If
 End Function
