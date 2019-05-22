@@ -24,6 +24,31 @@ Attribute VB_Name = "VersionModule"
 
 
 
+' version 0.03
+' update: 2019-05-22
+' ========================================================================================
+
+' small doc about data migration between objects:
+' WeeklyCoverage ->
+'   Corail Handler ->
+'       Screen Class (HTTP Req Handler GET and POST) ->
+'           CorailData ->
+'               Parser(DomHandler) ->
+'                   SuitableData (ExcelData) ->
+'                       next? LayoutClass?
+
+' ========================================================================================
+
+' version 0.02
+' update: 2019-05-21
+' ========================================================================================
+
+' next step: also a second branch on github 2019-05-21
+' first POST HTTP with successful download from corail from screen 2510
+
+' ========================================================================================
+
+
 ' version 0.01
 ' ========================================================================================
 
@@ -31,3 +56,6 @@ Attribute VB_Name = "VersionModule"
 ' oop: WeeklyCoverage as main object
 
 ' ========================================================================================
+
+
+

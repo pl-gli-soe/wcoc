@@ -103,7 +103,12 @@ Private Sub ILayout_putSomeColorsForThisPartNumber(r As Range)
     Dim cwr As Range
     ' Najpierw wpisz daty
     For x = 0 To coverCols - 1
-        s.Cells(rrow, x + 10).Value = IsoWeekNumber(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
+        
+        ' obsolete implementation
+        ' s.Cells(rrow, x + 10).Value = IsoWeekNumber(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
+        
+        ' using instead built-in iso week num foo directly from worksheet functions
+        s.Cells(rrow, x + 10).Value = Application.WorksheetFunction.IsoWeekNum(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
         
         Set cwr = s.Cells(rrow, x + 10)
         cwr.AddComment CStr(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1, "dd-mm-yyyy") + " - " + Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 7, "dd-mm-yyyy"))

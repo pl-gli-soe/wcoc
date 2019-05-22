@@ -59,27 +59,43 @@ End Sub
 
 Private Function ICorail_connectWithHttpReq(httpReq As HTTPRequestHandler) As Boolean
 
-    ' =========================================
+    ' really simple setter for private variable
+    ' ===========================================
     Set httpReqRef = httpReq
-    ' =========================================
+    ' ===========================================
     
 End Function
 
 Private Function ICorail_connectWithScreen(numberOfScreen As Variant) As Boolean
+
+
+    ' for now really simple logic, which checking and handling only 2 transactions from Corail
+    ' -------------------------------------------------------------------------------------------
     If numerOfScreen = 2510 Or numberOfScreen = 2720 Then
         ICorail_connectWithScreen = True
     Else
         ICorail_connectWithScreen = False
     End If
+    ' -------------------------------------------------------------------------------------------
+    
+    
 End Function
 
 Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As Variant, partNumber As Variant) As ICorailData
 
+
+    ' 90% of the implementation of this class
+    ' ----------------------------------------------------------------------------------
+    ' ----------------------------------------------------------------------------------
+
     If numberOfScreen = 2720 Then
         scr2720.screenSetup numberOfScreen, httpReqRef
-        Set ICorail_getDataFromScreen = scr2720.getData(pltCode, partNumber)
+        Set ICorail_getDataFromScreen = scr2720.getData(pltCode, partNumber) ' As ICorailData
     ElseIf numberOfScreen = 2510 Then
         scr2510.screenSetup numberOfScreen, httpReqRef
-        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber)
+        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC) ' As ICorailData
     End If
+    
+    ' ----------------------------------------------------------------------------------
+    ' ----------------------------------------------------------------------------------
 End Function

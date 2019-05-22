@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "CorailData"
+Attribute VB_Name = "CorailDataFrom2510"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -30,13 +30,6 @@ Attribute VB_Exposed = False
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
 
-
-
-
-' UWAGA! TA KLASA POWSTALA TYLKO NA POTRZEBY TESTU I JEST ZBYT OGOLNA
-' BY MOZNA BYLO KONKRETNIE ROBIC PARSOWANIE DLA BARDZO KONKRETNYCH DANYCH
-' PROSZE Z NIEJ NIE KORZYSTAC NA PRODUKCJI!
-
 Implements ICorailData
 
 
@@ -44,6 +37,7 @@ Implements ICorailData
 Private rawString As String
 Private theDomHandler As DOMHandler
 Private theParser As IParser
+Private sd As ISuitableData
 
 Private Sub Class_Initialize()
     rawString = ""
@@ -57,12 +51,12 @@ Private Sub Class_Terminate()
     Set theParser = Nothing
 End Sub
 
-Private Function ICorailData_getDom() As DOMHandler
-    Set ICorailData_getDom = theDomHandler
-End Function
-
 Private Function ICorailData_getString() As String
     ICorailData_getString = CStr(rawString)
+End Function
+
+Private Function ICorailData_getDom() As DOMHandler
+    Set ICorailData_getDom = theDomHandler
 End Function
 
 Private Sub ICorailData_parseString()
@@ -87,8 +81,17 @@ Private Sub ICorailData_parseString()
     End With
     
     
-    ' ten obiekt jest zbyt ogolny zeby mozna bylo parsowac wiecej konkretow
-    ' nie ma zadnych konkretnych elementow z danego ekranu Corail!
+    ' teraz parsujemy typowo dane z ekranu 2510
+    ' -----------------------------------------------------------------------------------------------
+    ' -----------------------------------------------------------------------------------------------
+    
+
+    theParser.importPackageOfData Me
+    Set sd = theParser.getConvertedDataSuitableForExcel()
+    
+    
+    ' -----------------------------------------------------------------------------------------------
+    ' -----------------------------------------------------------------------------------------------
     
     ' ========================================
 
@@ -105,3 +108,4 @@ Private Sub ICorailData_setString(arg As String)
     End With
     
 End Sub
+

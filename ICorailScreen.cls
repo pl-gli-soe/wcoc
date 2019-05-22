@@ -39,6 +39,6 @@ End Sub
 Public Function openData(plt, partNumber) As Boolean
 End Function
 
-Public Function getData(plt, partNumber) As ICorailData
+Public Function getData(plt, partNumber, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 End Function
 

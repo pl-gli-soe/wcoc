@@ -72,7 +72,7 @@ Private Sub Class_Terminate()
     Set valid = Nothing
 End Sub
 
-Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant) As ICorailData
+Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 
     ' -----------------------------------------------------------------------------
     url = "http://" & CStr(plt) & preUrl & screenUrl & CStr(partNumber)
@@ -81,7 +81,7 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant) As
     answer = req.httpGet(url)
     
     If valid.checkAnswer(num, answer) Then
-        Set theCorailData = New CorailData
+        Set theCorailData = New CorailDataFrom2720
         theCorailData.setString answer
         theCorailData.parseString
     Else

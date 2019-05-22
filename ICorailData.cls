@@ -45,3 +45,11 @@ Public Sub parseString()
 End Sub
 
 
+
+Public Function getDom() As DOMHandler
+End Function
+
+
+
+
+

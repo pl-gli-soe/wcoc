@@ -36,36 +36,82 @@ Implements IParser
 
 Private valid As Validator
 
-Private rawData As ICorailData
+Private rawCorailData As ICorailData
+Private sd As ISuitableData
 
 
 Private Sub Class_Initialize()
 
-    Set rawData = Nothing
+    Set rawCorailData = Nothing
+    Set valid = New Validator
+    Set sd = Nothing
 
 End Sub
 
 Private Sub Class_Terminate()
 
-    Set rawData = Nothing
+    Set rawCorailData = Nothing
+    Set valid = Nothing
+    Set sd = Nothing
 End Sub
 
+Private Function IParser_getConvertedDataSuitableForExcel() As ISuitableData
+    Set IParser_getConvertedDataSuitableForExcel = sd
+End Function
+
 Private Function IParser_getPackage() As ICorailData
-    Set IParser_getPackage = rawData
+    Set IParser_getPackage = rawCorailData
 End Function
 
 Private Sub IParser_importPackageOfData(pckg As ICorailData)
-    Set rawData = pckg
+    
+    Set rawCorailData = pckg
+    
     ' and try parse it!
-    innerParse
+    ' CorailDataFrom2720 or CorailDataFrom2510
+    
+    
+    If TypeName(pckg) = "CorailDataFrom2720" Then
+        innerParse2720
+    ElseIf TypeName(pckg) = "CorailDataFrom2510" Then
+        innerParse2510
+    End If
 End Sub
 
 
-Private Sub innerParse()
+Private Sub innerParse2510()
     
-    If valid.makeSomeValidationOnImportedPackage() Then
+    If valid.makeSomeValidationOnImportedPackage(rawCorailData) Then
         ' it is ok go on we working with this data
         ' -------------------------------------------
+        
+        Dim d As ICorailData ' CorailDataFrom2510
+        Set d = rawCorailData
+        
+        With d
+            
+        End With
+        
+        
+        ' -------------------------------------------
+    Else
+        MsgBox "Wrong type of package!"
+    End If
+End Sub
+
+
+Private Sub innerParse2720()
+    
+    If valid.makeSomeValidationOnImportedPackage(rawCorailData) Then
+        ' it is ok go on we working with this data
+        ' -------------------------------------------
+        
+        
+        Dim d As ICorailData ' CorailDataFrom2720
+        Set d = rawCorailData
+        
+        With d
+        End With
         
         
         ' -------------------------------------------

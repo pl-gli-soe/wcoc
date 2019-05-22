@@ -55,12 +55,16 @@ Private Sub Class_Initialize()
     Set valid = New Validator
     Set httpReq = New HTTPRequestHandler
     Set theCorail = New Corail
+    
+    Set theCorailData = Nothing
 End Sub
 
 Private Sub Class_Terminate()
     Set valid = Nothing
     Set httpReq = Nothing
     Set theCorail = Nothing
+    
+    Set theCorailData = Nothing
 End Sub
 
 
@@ -101,6 +105,54 @@ End Sub
 ' MAIN LOGIC FOR ONE ITERATION
 Private Sub makeInteration(ByRef inputRef As Range)
 
+
+    ' ----------------------------------------------------------------------------------------------------------
+    ' iteracja pracuje na jednej linii danych
+    ' kolejne etapy (pamietamy ze juz jestesmy w petli i raczej chcemy uniknac dodatkowej petli w
+    ' tymze subie juz):
+    '
+    ' 3.
+    ' poniewaz juz mamy gotowe http request handler - zakladam, ze pracowac bede pracowac synchronicznie
+    ' i czekac kolejne linie bez sciagania sie - do zmiany (moze) w pozniejszym czasie
+    '
+    ' 5.
+    ' nowy obiekt Corail o interfejsie ICorail wystepowac bedzie w postaci pojedynczej instancji
+    ' sprawdzy wstepnie czy httReq jest uzyteczny i jesli tak to robimy connection
+    '
+    '
+    ' 7. robimy kolejne standardowe polaczenie z danymi z ekranow 2720 oraz 2510 + opcjonalnie w kodzie widac
+    ' linijki wyrzucajace cale pliki na lokalny dysk C do katalogu Temp - bardzo uzyteczne na poczatku mojej drogi
+    ' powiazanej z mozliwoscia wykorzystania http post :)
+    '
+    '
+    ' 11. theCorail.getDataFromScreen(2720, plt, pn) - to jest bardzo kompleksowa metoda, ktora pobiera dane z ekranu
+    ' za pomoca zapytania http get lub post w zaleznosci od screenu jakiego pobieramy
+    '
+    ' jej interfejs wymuszony jest przez Interfejs ICorail:
+    ' Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As Variant, partNumber As Variant) As ICorailData
+    '
+    ' wnetrznosci klasy Corail same ustalaja w jaki sposob dane maja zostac pobrane bez jego jakiej kolwiek ingerencji usera,
+    ' nastepnie jest poprawnie parsowana i wyrzucona do postaci ustandaryzowanego obiekty interfejsu ICorailData
+    ' i teraz bardzo wazne, poniewaz ICorailData moze byc wlasciwie wszystkim i niczym, jedne co maja ze soba wspolnego to,
+    ' ze pierwotnym elementem wyjsciowym jest surowy string w standardzie html, ktory de facto moze zostac wyrzucony jako
+    ' lokalny plik html
+    ' nalezy pamietac ze klasy interfejsy ICorailData jest komponentem klasy Corail (oprocz ICorailData, jest jeszcze HTTP Request Handler oraz klasy ekranow Corail)
+    '
+    '
+    ' schemat: Corail uruchamia obiekt klasy: HTTPRequestHandler, ktory usluguje swoim klientom: klasom ekranow Corail, ktore z kolei usuluguja jednemu
+    ' standardowi: ICorailData, ktory jest ostatnia instancja przed wyrzuceniem danych do arkusza Excela
+    '
+    '
+    '
+    ' ICorailData priv components:
+    ' Private rawString As String ( to ten surowy string )
+    ' Private theDomHandler As DOMHandler ( surowy string uzbrojony w DOM - dzieki czemu mozemy odnosic sie do danych funkcjami typu getElementById itd itp)
+    ' Private theParser As IParser (parser, ktory pozwala wyluskac bardzo szczegolowe i konkretne dane - duzo wewnetrznej wspolpracy pomiedzy tym obiektem a DOMem)
+    '
+    '
+    '
+    ' ----------------------------------------------------------------------------------------------------------
+
     Dim plt As String
     Dim pn As String
     Dim fso As New FSOHandler
@@ -113,11 +165,24 @@ Private Sub makeInteration(ByRef inputRef As Range)
         theCorail.connectWithHttpReq httpReq
     
         If theCorail.connectWithScreen(2720) Then
+        
+            ' 2720
+            ' --------------------------------------------------------------
             Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
+            ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
+            ' --------------------------------------------------------------
+            
+            ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
             fso.makeHtmlFile "t2720_" & plt & "_" & pn, theCorailData.getString()
             
-            
+            ' 2510
+            ' --------------------------------------------------------------
             Set theCorailData = theCorail.getDataFromScreen(2510, plt, pn)
+            ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
+            
+            ' --------------------------------------------------------------
+            
+            ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
             fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
         End If
     Else
@@ -138,6 +203,9 @@ Private Sub initialSetupForInputList(ish As Worksheet)
     '
     
     If valid.checkIfThereIsAInputList(ish) Then
+    
+        ' no operation req!
+        
     Else
         MsgBox "Wrong input list!", vbExclamation
         End

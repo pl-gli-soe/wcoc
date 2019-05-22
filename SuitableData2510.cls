@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "IParser"
+Attribute VB_Name = "SuitableData2510"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -33,13 +33,6 @@ Attribute VB_Exposed = False
 
 
 
-Public Sub importPackageOfData(pckg As ICorailData)
-End Sub
-
-Public Function getPackage() As ICorailData
-End Function
+Implements ISuitableData
 
 
-
-Public Function getConvertedDataSuitableForExcel() As ISuitableData
-End Function

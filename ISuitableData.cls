@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "IParser"
+Attribute VB_Name = "ISuitableData"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -33,13 +33,4 @@ Attribute VB_Exposed = False
 
 
 
-Public Sub importPackageOfData(pckg As ICorailData)
-End Sub
-
-Public Function getPackage() As ICorailData
-End Function
-
-
-
-Public Function getConvertedDataSuitableForExcel() As ISuitableData
-End Function
+' THIS IS MAIN INTERFACE FOR EXCEL WORKSHEET ITSELF
