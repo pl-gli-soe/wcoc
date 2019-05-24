@@ -1,4 +1,19 @@
 Attribute VB_Name = "VersionModule"
+'
+' __        __        _    _          ____
+' \ \      / /__  ___| | _| |_   _   / ___|_____   _____ _ __ __ _  __ _  ___
+'  \ \ /\ / / _ \/ _ \ |/ / | | | | | |   / _ \ \ / / _ \ '__/ _` |/ _` |/ _ \
+'   \ V  V /  __/  __/   <| | |_| | | |__| (_) \ V /  __/ | | (_| | (_| |  __/
+'    \_/\_/ \___|\___|_|\_\_|\__, |  \____\___/ \_/ \___|_|  \__,_|\__, |\___|
+'   ___  _ __    / ___|___  _|___/_ _(_) |                         |___/
+'  / _ \| '_ \  | |   / _ \| '__/ _` | | |
+' | (_) | | | | | |__| (_) | | | (_| | | |
+'  \___/|_| |_|  \____\___/|_|  \__,_|_|_|
+'
+'
+'01010111 01100101 01100101 01101011 01101100 01111001  01000011 01101111 01110110 01100101 01110010 01100001 01100111 01100101
+'01101111 01101110  01000011 01101111 01110010 01100001 01101001 01101100
+'
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
@@ -23,6 +38,28 @@ Attribute VB_Name = "VersionModule"
 'SOFTWARE.
 
 
+' version 0.05
+' update: 2019-05-24
+' ========================================================================================
+
+' corail data from 2510 need to be partially, so there will be an collection instead simple:
+'
+' Private rawString As String - will be collection of these
+' + Private Sub ICorailData_setString(arg As String) will not assign to primitive
+' but adding a new one with simple string and dom object into new element
+' of metioned collection
+
+' ========================================================================================
+
+
+' version 0.04
+' update: 2019-05-23
+' ========================================================================================
+
+' small doc about data migration between objects:
+' SuitableData without Main Interface - passing as Variant, so no list after dot.
+
+' ========================================================================================
 
 ' version 0.03
 ' update: 2019-05-22

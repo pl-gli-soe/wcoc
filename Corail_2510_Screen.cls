@@ -7,6 +7,20 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' __        __        _    _          ____
+' \ \      / /__  ___| | _| |_   _   / ___|_____   _____ _ __ __ _  __ _  ___
+'  \ \ /\ / / _ \/ _ \ |/ / | | | | | |   / _ \ \ / / _ \ '__/ _` |/ _` |/ _ \
+'   \ V  V /  __/  __/   <| | |_| | | |__| (_) \ V /  __/ | | (_| | (_| |  __/
+'    \_/\_/ \___|\___|_|\_\_|\__, |  \____\___/ \_/ \___|_|  \__,_|\__, |\___|
+'   ___  _ __    / ___|___  _|___/_ _(_) |                         |___/
+'  / _ \| '_ \  | |   / _ \| '__/ _` | | |
+' | (_) | | | | | |__| (_) | | | (_| | | |
+'  \___/|_| |_|  \____\___/|_|  \__,_|_|_|
+'
+'
+'01010111 01100101 01100101 01101011 01101100 01111001  01000011 01101111 01110110 01100101 01110010 01100001 01100111 01100101
+'01101111 01101110  01000011 01101111 01110010 01100001 01101001 01101100
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
@@ -66,8 +80,11 @@ Private Sub Class_Initialize()
 
     num = 2510
     
+    
+    
+    
     strona = 1
-    ileLiniiNaStronie = 256
+    ileLiniiNaStronie = 20
     
     screenUrl = "/getOrderViewPager.do"
             
@@ -101,65 +118,86 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Op
     
     
     Dim answer As String
+    Dim ktoraStrona As Integer
+    
     answer = ""
+    ktoraStrona = 1
     
+    
+    Set theCorailData = New CorailDataFrom2510
     
 
+    Do
 
+        If e = E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC Then
+        
+        
+            ' CALCULATED
+            ' -----------------------------------------------------------------------------
+        
+        
+            ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
+            url = "http://" & CStr(plt) & preUrl & screenUrl
+            args = makeSomeArgsForMe("CALCULATED", partNumber, ktoraStrona)
+            
+            Debug.Print "http post: " & url & " " & args
+            answer = req.httpPost(url, args)
+            
+            theCorailData.setString answer
+            
+            ' after loop, when all data collected
+            'theCorailData.parseString
+            'Set ICorailScreen_getData = theCorailData
+            ' -----------------------------------------------------------------------------
+        
+        ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2510_UPDATED Then
+        
+            ' UPDATED
+            ' -----------------------------------------------------------------------------
+            
+            ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
+            url = "http://" & CStr(plt) & preUrl & screenUrl
+            args = makeSomeArgsForMe("UPDATED", partNumber, ktoraStrona)
+            answer = req.httpPost(url, args)
+            
+            theCorailData.setString answer
+            
+            ' after loop, when all data collected
+            'theCorailData.parseString
+            'Set ICorailScreen_getData = theCorailData
+            ' -----------------------------------------------------------------------------
+            
+        Else
+            ' sth is wrong
+            'Debug.Print "This type of data for this screen is not available: ICorailScreen_getData 2510 class: Corail_2510_Screen line: 94"
+            'Set ICorailScreen_getData = Nothing
+            
+            ' bez rozroznienia jesli chodzi czy updated, czy calculated
+            
+            ' ALL
+            ' -----------------------------------------------------------------------------
+            
+            ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
+            url = "http://" & CStr(plt) & preUrl & screenUrl
+            args = makeSomeArgsForMe("", partNumber, ktoraStrona)
+            answer = req.httpPost(url, args)
+            
+            theCorailData.setString answer
+            
+            ' after loop, when all data collected
+            'theCorailData.parseString
+            'Set ICorailScreen_getData = theCorailData
+            ' -----------------------------------------------------------------------------
+        End If
+        
+        
+        ktoraStrona = ktoraStrona + 1
+    
+    Loop While isThereStillSthToParse(answer)
 
-    If e = E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC Then
-    
-    
-        ' CALCULATED
-        ' -----------------------------------------------------------------------------
-    
-    
-        ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
-        url = "http://" & CStr(plt) & preUrl & screenUrl
-        args = makeSomeArgsForMe("CALCULATED", partNumber)
-        answer = req.httpPost(url, args)
-        Set theCorailData = New CorailDataFrom2510
-        theCorailData.setString answer
-        theCorailData.parseString
-        Set ICorailScreen_getData = theCorailData
-        ' -----------------------------------------------------------------------------
-    
-    ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2510_UPDATED Then
-    
-        ' UPDATED
-        ' -----------------------------------------------------------------------------
-        
-        ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
-        url = "http://" & CStr(plt) & preUrl & screenUrl
-        args = makeSomeArgsForMe("UPDATED", partNumber)
-        answer = req.httpPost(url, args)
-        Set theCorailData = New CorailDataFrom2510
-        theCorailData.setString answer
-        theCorailData.parseString
-        Set ICorailScreen_getData = theCorailData
-        ' -----------------------------------------------------------------------------
-        
-    Else
-        ' sth is wrong
-        'Debug.Print "This type of data for this screen is not available: ICorailScreen_getData 2510 class: Corail_2510_Screen line: 94"
-        'Set ICorailScreen_getData = Nothing
-        
-        ' bez rozroznienia jesli chodzi czy updated, czy calculated
-        
-        ' UPDATED
-        ' -----------------------------------------------------------------------------
-        
-        ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
-        url = "http://" & CStr(plt) & preUrl & screenUrl
-        args = makeSomeArgsForMe("", partNumber)
-        answer = req.httpPost(url, args)
-        Set theCorailData = New CorailData
-        theCorailData.setString answer
-        theCorailData.parseString
-        Set ICorailScreen_getData = theCorailData
-        ' -----------------------------------------------------------------------------
-    End If
-
+    ' now parse all
+    theCorailData.parseString
+    Set ICorailScreen_getData = theCorailData
 
     
     ' here for later usage for sum validation:
@@ -182,8 +220,67 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Op
 End Function
 
 
+Private Function isThereStillSthToParse(answer) As Boolean
+    isThereStillSthToParse = False
+    
+    
+    
+    firstLine = Split(answer, Chr(10))(0)
+    
+    arr = Split(firstLine, " ")
+    
+    
+    Dim newVal As Long
+    
+    For x = LBound(arr) To UBound(arr)
+        ' Debug.Print arr(x)
+        
+        If CStr(arr(x)) Like "numberOfElement=*" Then
+        
+            tmp = Split(arr(x), "=")(1)
+            tmp = Replace(tmp, Chr(34), "")
+            newVal = CLng(tmp)
+            numberOfElements = newVal
+            ' Exit For
+        End If
+        
+        If CStr(arr(x)) Like "pageSize=*" Then
+        
+            tmp = Split(arr(x), "=")(1)
+            tmp = Replace(tmp, Chr(34), "")
+            newVal = Int(tmp)
+            currentPageSize = newVal
+            ' Exit For
+        End If
+        
+        If CStr(arr(x)) Like "indicePage=*" Then
+        
+            tmp = Split(arr(x), "=")(1)
+            tmp = Replace(tmp, Chr(34), "")
+            newVal = Int(tmp)
+            currentPage = newVal
+            ' Exit For
+        End If
+        
+        If CStr(arr(x)) Like "numberOfPage=*" Then
+            tmp = Split(arr(x), "=")(1)
+            tmp = Replace(tmp, Chr(34), "")
+            tmp = Replace(tmp, "-->", "")
+            newVal = Int(tmp)
+            pages = newVal
+        End If
+    Next x
+    
+    If currentPage <= pages Then
+        isThereStillSthToParse = True
+    Else
+        isThereStillSthToParse = False
+    End If
+End Function
 
-Private Function makeSomeArgsForMe(arg, partNumber) As String
+
+
+Private Function makeSomeArgsForMe(arg, partNumber, ktoraStrona) As String
     
     ' arg - updated or calculated - but at the end will have same url from contruction perspective
     ' becuae all rest in baiscally the same dates and other params
@@ -210,11 +307,13 @@ Private Function makeSomeArgsForMe(arg, partNumber) As String
 '        "&displayLocal=false" & _
 '        "&productCode=" & partNumber
 
-    tmp = "page=1&max=500&charset=UTF-8" & _
-        "&forecast=true" & _
+    tmp = "page=" & ktoraStrona & _
+        "&max=" & ileLiniiNaStronie & _
+        "&charset=UTF-8" & _
+        "&forecast=false" & _
         "&eventType=RQ" & _
         thisStartDate & thisEndDate & _
-        "ecwDivId=orderView" & _
+        "&ecwDivId=orderView" & _
         "&productCode=" & partNumber
     
     makeSomeArgsForMe = tmp
@@ -237,8 +336,8 @@ Function parseFromDate(i As Integer)
     
     
     Dim d1 As Date, d2 As Date
-    d1 = Date - 10
-    d2 = Date + 100
+    d1 = Date - 30
+    d2 = Date + 140
     
     
     

@@ -33,6 +33,4 @@ Attribute VB_Exposed = False
 
 
 
-Implements ISuitableData
-
 

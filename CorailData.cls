@@ -57,6 +57,10 @@ Private Sub Class_Terminate()
     Set theParser = Nothing
 End Sub
 
+Private Function ICorailData_getCollectionOfData() As Collection
+    Set ICorailData_getCollectionOfData = Nothing
+End Function
+
 Private Function ICorailData_getDom() As DOMHandler
     Set ICorailData_getDom = theDomHandler
 End Function

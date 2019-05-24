@@ -39,7 +39,7 @@ Public inputButton As HTMLInputButtonElement
 Public button As HTMLButtonElement
 
 Public a As HTMLAnchorElement
-Public s As HTMLSelectElement
+Public S As HTMLSelectElement
 
 Public elementCollection As HTMLElementCollection
 Public iElementCollection As IHTMLElementCollection

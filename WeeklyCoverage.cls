@@ -78,9 +78,9 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     ' -------------------------------------
 
     ' new rep
-    Set repWorksheet = ThisWorkbook.Sheets.Add
-    repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
-    Set repCell = repWorksheet.Cells(2, 1)
+    'Set repWorksheet = ThisWorkbook.Sheets.Add
+    'repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
+    'Set repCell = repWorksheet.Cells(2, 1)
 
 
     initialSetupForInputList ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM)
@@ -173,7 +173,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
-            fso.makeHtmlFile "t2720_" & plt & "_" & pn, theCorailData.getString()
+            'fso.makeHtmlFile "t2720_" & plt & "_" & pn, theCorailData.getString()
             
             ' 2510
             ' --------------------------------------------------------------
@@ -183,7 +183,21 @@ Private Sub makeInteration(ByRef inputRef As Range)
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
-            fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
+            'fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
+            Dim DH As DOMHandler
+            i = 1
+            'For Each txt In theCorailData.getCollectionOfData()
+            '    fso.makeHtmlFile "t2510_" & "_" & i & "_" & plt & "_" & pn, CStr(txt)
+            '    i = i + 1
+            'Next txt
+            ' Debug.Print theCorailData.getCollectionOfData().Count
+            
+            i = 1
+            For Each item In theCorailData.getCollectionOfData()
+                ' Debug.Print TypeName(item)  ' String OK
+                fso.makeHtmlFile "t2510_" & "_" & i & "_" & plt & "_" & pn, CStr(item)
+                i = i + 1
+            Next item
         End If
     Else
         MsgBox "Fatal error during http connection!", vbExclamation

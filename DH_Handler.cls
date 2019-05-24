@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ICorailData"
+Attribute VB_Name = "DH_Handler"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
-' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
+' Mateusz Milewski mateusz.milewski@opel.com aka FORREST
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -33,27 +33,12 @@ Attribute VB_Exposed = False
 
 
 
-Public Function getString() As String
-End Function
+' if date empty, then: 00:00:00
 
-
-Public Sub setString(arg As String)
-End Sub
-
-
-Public Sub parseString()
-End Sub
-
-
-
-Public Function getDom() As DOMHandler
-End Function
-
-
-Public Function getCollectionOfData() As Collection
-End Function
-
-
-
+Public DHEO As Date
+Public DHEF As Date
+Public DHXC As Date
+Public DHAS As Date
+Public DHRQ As Date
 
 

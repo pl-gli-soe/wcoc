@@ -47,6 +47,8 @@ End Sub
 
 Public Sub makeHtmlFile(filename As String, txt As String)
 
+    ' Debug.Print txt
+
     Dim myFile As Object
     Set myFile = fso.CreateTextFile("" & pth & filename & ".html", True, True)
     myFile.Write txt
