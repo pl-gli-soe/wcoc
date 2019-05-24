@@ -32,6 +32,41 @@ Attribute VB_Exposed = False
 
 
 
+' SUITABLE DATA FROM 2720
 
-Implements ISuitableData
+Public plt As String
+Public pn As String
+Public stock As Double
+Public approId As String
+Public approName As String
+Public area As String
+Public tipd As String
+Public hebdo As String
+Public periodique As String
+Public upstreamFlow As String
+Public internals As String
+Public majorComment As String
 
+
+Private item As CoverageItem
+Private collectionOfCovLines As Collection
+
+
+Public Sub addCovLine(i As CoverageItem)
+    
+    collectionOfCovLines.Add i
+End Sub
+
+Public Function getCollectionOfItems() As Collection
+    Set getCollectionOfItems = collectionOfCovLines
+End Function
+
+
+
+Private Sub Class_Initialize()
+    Set collectionOfCovLines = New Collection
+End Sub
+
+Private Sub Class_Terminate()
+    Set collectionOfCovLines = Nothing
+End Sub

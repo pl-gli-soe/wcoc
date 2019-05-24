@@ -37,7 +37,7 @@ Implements ICorailData
 Private rawString As String
 Private theDomHandler As DOMHandler
 Private theParser As IParser
-Private sd As ISuitableData
+Private sd As SuitableData2510
 
 Private Sub Class_Initialize()
     rawString = ""
@@ -68,6 +68,9 @@ Private Sub ICorailData_parseString()
     ' Debug.Print rawString
     
     
+    ' this is just for local html file testing - becuase there were no empty space
+    ' between cells in table and no borders at all so was difficult to find out
+    ' where data starts or ends
     rawString = "<style> table tr td { padding: 4px; }</style>" & Chr(10) & rawString
     
     Set theDomHandler = Nothing
@@ -87,7 +90,10 @@ Private Sub ICorailData_parseString()
     
 
     theParser.importPackageOfData Me
+    ' sd As SuitableData2510 and foo as Variant but VBA allows
     Set sd = theParser.getConvertedDataSuitableForExcel()
+    
+    Debug.Print "ICorailData_parseString " & TypeName(sd)
     
     
     ' -----------------------------------------------------------------------------------------------
@@ -106,6 +112,16 @@ Private Sub ICorailData_setString(arg As String)
         .doc.body.innerHTML = arg
         .idoc.body.innerHTML = .doc.body.innerHTML
     End With
+    
+    ' check first line for validation
+    ' ----------------------------------------------
+    firstLine = Split(rawString, Chr(10))(0)
+    
+    arr = Split(firstLine, " ")
+    
+    For x = LBound(arr) To UBound(arr)
+        Debug.Print arr(x)
+    Next x
     
 End Sub
 

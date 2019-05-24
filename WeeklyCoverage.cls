@@ -78,9 +78,9 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     ' -------------------------------------
 
     ' new rep
-    Set repWorksheet = ThisWorkbook.Sheets.Add
-    repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
-    Set repCell = repWorksheet.Cells(2, 1)
+    'Set repWorksheet = ThisWorkbook.Sheets.Add
+    'repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
+    'Set repCell = repWorksheet.Cells(2, 1)
 
 
     initialSetupForInputList ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM)
@@ -173,7 +173,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
-            fso.makeHtmlFile "t2720_" & plt & "_" & pn, theCorailData.getString()
+            'fso.makeHtmlFile "t2720_" & plt & "_" & pn, theCorailData.getString()
             
             ' 2510
             ' --------------------------------------------------------------
@@ -183,7 +183,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
-            fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
+            'fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
         End If
     Else
         MsgBox "Fatal error during http connection!", vbExclamation

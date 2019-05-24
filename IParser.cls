@@ -41,5 +41,5 @@ End Function
 
 
 
-Public Function getConvertedDataSuitableForExcel() As ISuitableData
+Public Function getConvertedDataSuitableForExcel() As Variant
 End Function
