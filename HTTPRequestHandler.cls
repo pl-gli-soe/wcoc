@@ -74,6 +74,9 @@ End Function
 
 Public Function httpPost(url, args) As String
 
+
+    Debug.Print "httpPost: args: " & args
+
     With request
         .Open "POST", url, False
         .setRequestHeader "Accept", "*/*"

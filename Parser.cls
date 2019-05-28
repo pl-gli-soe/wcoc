@@ -124,14 +124,252 @@ Private Sub innerParse2510()
         
         Set sd = New SuitableData2510
         
-        Dim c As Collection
-        Set c = d.getCollectionOfData()
+        Dim coll As Collection
+        Debug.Print "test d.getCollectionOfData().count: " & d.getCollectionOfData().Count
+        Set coll = d.getCollectionOfData()
+        
+        
+        ' c is an collection of pages
+        
+        ' !!!
+        '  -> change into dom
+        Dim stronaOrderow As Variant
+        Dim maintables As IHTMLElementCollection
+        Dim divElement As IHTMLElement
+        Dim divTempElement As IHTMLElement
+        Dim parentDivTable As IHTMLElement
+        
+        
+        Dim tds As IHTMLElementCollection, t As IHTMLTable, tc As IHTMLTableCell ' divTempElement - juz zadeklarowany i go wykorzystam tutaj
+        Dim r As HTMLTableRow
+        Dim c As HTMLTableCell
+        
+        Dim oItem As OrderItem
+        
+        
+        ' temps vars
+        ' --------------------------------------------------------------------------------------------------
+        ' --------------------------------------------------------------------------------------------------
+        
+        Dim tmpStrSgrLine As String, tmpStrPn As String, tmpStrQty As String, tmpStrOrderNum As String
+        Dim tmpStrDn As String, tmpStrDHEO As String, tmpStrDHEF As String, tmpStrDHXC As String
+        Dim tmpStrDHAS As String, tmpStrDHRQ As String, tmpStrS1 As String, tmpStrRouting As String
+        Dim tmpStrD As String, tmpStrSeller As String, tmpStrShipper As String, tmpStrS2 As String, tmpStrUM As String
+        
+        Dim tmpDH_Handler As DH_Handler
+        
+        ' --------------------------------------------------------------------------------------------------
+        ' --------------------------------------------------------------------------------------------------
+        
+        
+        
+        For Each stronaOrderow In coll
+        
+        
+            ' every page will be treat as seperate web-page
+            d.getDom.idoc.body.innerHTML = stronaOrderow
+            d.getDom.doc.body.innerHTML = stronaOrderow
+            
+            
+            
+            Set maintables = d.getDom.idoc.getElementsByTagName("div")
+            
+            
+            ' just get first one!
+            ' ===========================================
+            For Each divElement In maintables
+            
+                If divElement.className = "ecwTableBody" Then
+                
+                    Set parentDivTable = divElement
+                    Exit For
+                End If
+            Next divElement
+            ' ===========================================
+            
+            
+
+            Set t = parentDivTable.getElementsByTagName("table")(0)
+        
+        
+            For Each r In t.Rows
+            
+                Set oItem = Nothing
+                Set oItem = New OrderItem
+                
+                
+                ' init by empty
+                ' ----------------------------------------------
+                tmpStrSgrLine = ""
+                tmpStrPn = ""
+                tmpStrQty = ""
+                tmpStrOrderNum = ""
+                tmpStrDn = ""
+                tmpStrDHEO = ""
+                tmpStrDHEF = ""
+                tmpStrDHXC = ""
+                tmpStrDHAS = ""
+                tmpStrDHRQ = ""
+                tmpStrS1 = ""
+                tmpStrRouting = ""
+                tmpStrD = ""
+                tmpStrSeller = ""
+                tmpStrShipper = ""
+                tmpStrS2 = ""
+                tmpStrUM = ""
+                
+                Set tmpDH_Handler = New DH_Handler
+                ' ----------------------------------------------
+                
+                i = 1
+            
+                For Each c In r.Cells
+                    ' Debug.Print c.outerHTML & ", class: " & c.className & " inner: " & c.innerHTML & " tag: " & c.tagName
+                    ' <TH class=ecwTableSortable>SGR/Line</TH>, class: ecwTableSortable inner: SGR/Line tag: TH
+                    ' ...
+                    ' <TH>Qty</TH>, class:  inner: Qty tag: TH
+                    ' <TH class=ecwTableSortable>DHEO</TH>, class: ecwTableSortable inner: DHEO tag: TH
+                    ' ...
+                    ' <TH>Seller </TH>, class:  inner: Seller  tag: TH
+                    ' <TH>Shipper </TH>, class:  inner: Shipper  tag: TH
+                    If c.tagName = "TD" Then
+                        Set divTempElement = c.getElementsByTagName("div")(0)
+                        
+                        ' Debug.Print "c.getElementsByTagName(div)(0) > o: " & divTempElement.outerHTML & " i: " & divTempElement.innerHTML
+                        
+                        ' 1 &nbsp (consult button)
+                        
+                        ' 2 <DIV class=text>891/9</DIV> (SGR LIne)
+                        If i = 2 Then tmpStrSgrLine = CStr(divTempElement.innerHTML)
+                        
+                        ' 3 <DIV class="ecwButtonTexteOver text">9810867580</DIV> i: 9810867580 (PN)
+                        If i = 3 Then tmpStrPn = CStr(divTempElement.innerHTML)
+                        
+                        ' 4 <DIV class=number>720.0</DIV> i: 720.0 (Qty)
+                        If i = 4 Then
+                            tmpStrQty = CStr(divTempElement.innerHTML)
+                        End If
+                        
+                        ' 5 <DIV class=text>004010222</DIV> i: 004010222 (order num)
+                        If i = 5 Then tmpStrOrderNum = CStr(divTempElement.innerHTML)
+                        
+                        ' 6 <DIV class=text>69206418</DIV> i: 69206418 (dn)
+                        If i = 6 Then tmpStrDn = CStr(divTempElement.innerHTML)
+                        
+                        ' 7 <DIV class=date>19/05/21 08:50</DIV> i: 19/05/21 08:50 (DHEO)
+                        ' 8 <DIV class=date>19/05/23 14:00</DIV> i: 19/05/23 14:00 (DHEF)
+                        ' 9 <DIV class=date>&nbsp;</DIV> i: &nbsp; (DHXC)
+                        ' 10 <DIV class=date>19/05/28 10:20</DIV> i: 19/05/28 10:20 (DHAS)
+                        ' 11 <DIV class=date>19/05/28 11:30</DIV> i: 19/05/28 11:30 (DHRQ)
+                        If i >= 7 And i <= 11 Then
+                            ' all DHXX here
+                            ' --------------------------------------------------------------------------
+                            
+                            If i = 7 Then tmpStrDHEO = CStr(divTempElement.innerHTML)
+                            If i = 8 Then tmpStrDHEF = CStr(divTempElement.innerHTML)
+                            If i = 9 Then tmpStrDHXC = CStr(divTempElement.innerHTML)
+                            If i = 10 Then tmpStrDHAS = CStr(divTempElement.innerHTML)
+                            If i = 11 Then tmpStrDHRQ = CStr(divTempElement.innerHTML)
+                            ' --------------------------------------------------------------------------
+                        End If
+                        
+                        ' 12 <DIV class=text>3383</DIV> i: 3383 (S (1))
+                        If i = 12 Then tmpStrS1 = CStr(divTempElement.innerHTML)
+                        
+                        ' 13 <DIV class=text>L9 FBC</DIV> i: L9 FBC (routing)
+                        If i = 13 Then tmpStrRouting = CStr(divTempElement.innerHTML)
+                        
+                        ' 14 <DIV class=text>TC2</DIV> i: TC2 (D)
+                        If i = 14 Then tmpStrD = CStr(divTempElement.innerHTML)
+                        
+                        ' 15 <DIV class=text>94656L 01</DIV> i: 94656L 01 (SELLER)
+                        If i = 15 Then tmpStrSeller = CStr(divTempElement.innerHTML)
+                        
+                        ' 16 <DIV class=text>94656L 02</DIV> i: 94656L 02 (SHIPPER)
+                        If i = 16 Then tmpStrShipper = CStr(divTempElement.innerHTML)
+                        
+                        ' 17 <DIV class="text RED">EF</DIV> i: EF (s (2) status)
+                        If i = 17 Then tmpStrS2 = CStr(divTempElement.innerHTML)
+                        
+                        ' 18 <DIV class=text>20308</DIV> i: 20308 (UM)
+                        If i = 18 Then
+                            tmpStrUM = CStr(divTempElement.innerHTML)
+                            
+                            
+                            
+                            ' and this is the last one - here we can make some inital setup
+                            ' on data...
+                            'setup all data from i = 1 to 18
+                            ' ==========================================================================
+                            ' ==========================================================================
+                            ''
+                            '
+                            Set tmpDH_Handler = Nothing
+                            Set tmpDH_Handler = New DH_Handler
+                            
+                            If checkIfDateAndTime(tmpStrDHEO) Then
+                                tmpDH_Handler.DHEO = parseStringToDateTime(tmpStrDHEO)
+                            End If
+                            
+                            If checkIfDateAndTime(tmpStrDHEF) Then
+                                tmpDH_Handler.DHEF = parseStringToDateTime(tmpStrDHEF)
+                            End If
+                            
+                            If checkIfDateAndTime(tmpStrDHXC) Then
+                                tmpDH_Handler.DHXC = parseStringToDateTime(tmpStrDHXC)
+                            End If
+                            
+                            If checkIfDateAndTime(tmpStrDHAS) Then
+                                tmpDH_Handler.DHAS = parseStringToDateTime(tmpStrDHAS)
+                            End If
+                            
+                            If checkIfDateAndTime(tmpStrDHRQ) Then
+                                tmpDH_Handler.DHRQ = parseStringToDateTime(tmpStrDHRQ)
+                            End If
+                            
+                            
+                            Dim qtyAsDouble As Double
+                            qtyAsDouble = 0
+                            On Error Resume Next
+                            qtyAsDouble = CDbl(forceStringToBeDouble(tmpStrQty))
+                            
+                            With oItem
+                                .coforConstructor tmpStrSeller, tmpStrShipper
+                                .dhConstructor tmpDH_Handler
+                                .commonConstructor tmpStrSgrLine, tmpStrPn, qtyAsDouble, tmpStrOrderNum, tmpStrDn, tmpStrS1, tmpStrRouting, tmpStrD, tmpStrS2, tmpStrUM
+                            End With
+                            
+                            
+                            '
+                            ''
+                            ' ==========================================================================
+                            ' ==========================================================================
+                        End If
+                    End If
+                    
+                    i = i + 1
+                Next c
+                
+                
+                
+                If oItem.checkIsObjectReady() Then
+                    sd.addOrder oItem
+                End If
+                
+                
+            Next r
+        
+
+        Next stronaOrderow
         
         
         
         
             
-    
+
+        'For Each oItem In sd.getOrders()
+        '     Debug.Print "oi pn: " & oItem.getElement(E_2510_PRODUCT) & " qty: " & oItem.getElement(E_2510_QTY) & " DHRQ: " & oItem.getElement(E_2510_DH).DHRQ
+        'Next oItem
         
         
         ' -------------------------------------------
@@ -475,6 +713,47 @@ Private Function parseStringToDate(strD) As Date
     
 End Function
 
+Private Function parseStringToDateTime(strDT) As Date
+    
+    ' format 19/05/29 10:20
+    ' format yy/mm/dd hh:mm
+    
+    Dim d As Integer
+    Dim m As Integer
+    Dim y As Integer
+    
+    Dim hh As Integer
+    Dim mm As Integer
+    
+
+    If IsNumeric(Left(strDT, 2)) Then
+        y = Int(Left(strDT, 2))
+    End If
+    
+    If IsNumeric(Mid(strDT, 4, 2)) Then
+        m = Int(Mid(strDT, 4, 2))
+    End If
+    
+    If IsNumeric(Mid(strDT, 7, 2)) Then
+        d = Int(Mid(strDT, 7, 2))
+    End If
+    
+    If IsNumeric(Mid(strDT, 10, 2)) Then
+        hh = Int(Mid(strDT, 10, 2))
+    End If
+    
+    If IsNumeric(Mid(strDT, 13, 2)) Then
+        mm = Int(Mid(strDT, 13, 2))
+    End If
+    
+    
+    Dim S As String
+    S = Format(y & "-" & m & "-" & d & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
+    
+    parseStringToDateTime = CDate(CStr(S))
+    
+End Function
+
 Private Function checkIfDate(strD) As Boolean
 
     checkIfDate = False
@@ -484,6 +763,25 @@ Private Function checkIfDate(strD) As Boolean
         If Mid(strD, 3, 1) = "/" Then
             If Mid(strD, 6, 1) = "/" Then
                 checkIfDate = True
+            End If
+        End If
+    End If
+End Function
+
+
+Private Function checkIfDateAndTime(strDT) As Boolean
+
+    checkIfDateAndTime = False
+    
+    If Len(strDT) = 14 Then
+    
+        If Mid(strDT, 3, 1) = "/" Then
+            If Mid(strDT, 6, 1) = "/" Then
+                If Mid(strDT, 9, 1) = " " Then
+                    If Mid(strDT, 12, 1) = ":" Then
+                        checkIfDateAndTime = True
+                    End If
+                End If
             End If
         End If
     End If

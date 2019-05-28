@@ -60,9 +60,9 @@ Public Function isReady() As Boolean
     isReady = ready
 End Function
 
-Public Sub constructor(md As Date, mPcDemand As Double, mIncBc As Double, mo As Double, msh As Double)
+Public Sub constructor(mD As Date, mPcDemand As Double, mIncBc As Double, mo As Double, msh As Double)
 
-    d = CDate(md)
+    d = CDate(mD)
     pcDemand = CDbl(mPcDemand)
     incBc = CDbl(mIncBc)
     ordered = CDbl(mo)

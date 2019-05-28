@@ -38,6 +38,17 @@ Attribute VB_Name = "VersionModule"
 'SOFTWARE.
 
 
+
+' version 0.06
+' update: 2019-05-28
+' ========================================================================================
+
+' first prototype for shipping data collected into excel cells
+' still missing some orders proper config
+
+' ========================================================================================
+
+
 ' version 0.05
 ' update: 2019-05-24
 ' ========================================================================================

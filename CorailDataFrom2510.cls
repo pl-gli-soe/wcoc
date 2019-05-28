@@ -82,6 +82,10 @@ Private Function ICorailData_getDom() As DOMHandler
     Set ICorailData_getDom = theDomHandler
 End Function
 
+Private Function ICorailData_getSuitableData() As Variant
+    Set ICorailData_getSuitableData = sd
+End Function
+
 Private Sub ICorailData_parseString()
 
 

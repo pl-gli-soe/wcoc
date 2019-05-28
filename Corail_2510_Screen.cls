@@ -182,6 +182,8 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Op
             args = makeSomeArgsForMe("", partNumber, ktoraStrona)
             answer = req.httpPost(url, args)
             
+            
+            ' but for this example this set is actually add!!!
             theCorailData.setString answer
             
             ' after loop, when all data collected
@@ -290,6 +292,9 @@ Private Function makeSomeArgsForMe(arg, partNumber, ktoraStrona) As String
     'args = "page=1&max=256&charset=UTF-8&ecwAutoId=false&ecwDivId=orderView&statusList=EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:ST" & _
     '    "&eventType=RQ&forecast=false&logisticObjectTypeCode=CALCULATED&displayLocal=false&productCode=9810867580"
     
+    ' pod ordery! 209-05-28
+    ' CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:AN
+    
     
     thisStartDate = parseFromDate(1)
     thisEndDate = parseFromDate(2)
@@ -298,23 +303,30 @@ Private Function makeSomeArgsForMe(arg, partNumber, ktoraStrona) As String
     
     
     Dim tmp As String
-'    tmp = "page=1&max=500&charset=UTF-8" & _
-'        "&ecwAutoId=false&ecwDivId=orderView&statusList=EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ" & _
-'        thisStartDate & thisEndDate & _
-'        "&eventType=RQ" & _
-'        "&forecast=true" & _
-'        "&logisticObjectTypeCode=" & arg & _
-'        "&displayLocal=false" & _
-'        "&productCode=" & partNumber
 
-    tmp = "page=" & ktoraStrona & _
-        "&max=" & ileLiniiNaStronie & _
-        "&charset=UTF-8" & _
-        "&forecast=false" & _
-        "&eventType=RQ" & _
-        thisStartDate & thisEndDate & _
-        "&ecwDivId=orderView" & _
-        "&productCode=" & partNumber
+
+    If arg <> "" Then
+
+        tmp = "page=" & ktoraStrona & _
+            "&max=" & ileLiniiNaStronie & _
+            "&charset=UTF-8" & _
+            "&forecast=false" & _
+            "&logisticObjectTypeCode=" & arg & _
+            "&eventType=RQ" & _
+            thisStartDate & thisEndDate & _
+            "&productCode=" & partNumber
+    
+    Else
+    
+        tmp = "page=" & ktoraStrona & _
+            "&max=" & ileLiniiNaStronie & _
+            "&charset=UTF-8" & _
+            "&forecast=true" & _
+            "&eventType=RQ" & _
+            thisStartDate & thisEndDate & _
+            "&productCode=" & partNumber
+    
+    End If
     
     makeSomeArgsForMe = tmp
     

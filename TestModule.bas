@@ -27,8 +27,23 @@ Attribute VB_Name = "TestModule"
 
 
 
-Public Sub testOnEmptyDate()
+Private Sub testOnEmptyDate()
     
     Dim d As Date
     Debug.Print d ' 00:00:00
+End Sub
+
+
+' public sub testOnOrderItemAndTry to get
+' OK!
+Private Sub testOnOrderItem()
+    
+    Dim oi As OrderItem
+    Set oi = New OrderItem
+    
+    oi.coforConstructor "123", "456"
+    
+    Debug.Print oi.checkIsObjectReady() ' should be false
+    
+    Debug.Print oi.getElement(E_2510_SHIPPER) ' should be 456
 End Sub

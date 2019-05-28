@@ -34,11 +34,14 @@ Attribute VB_Exposed = False
 
 
 ' if date empty, then: 00:00:00
+' ---------------------------------
 
 Public DHEO As Date
 Public DHEF As Date
 Public DHXC As Date
 Public DHAS As Date
 Public DHRQ As Date
+
+' ---------------------------------
 
 

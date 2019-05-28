@@ -54,6 +54,10 @@ Public Function getCollectionOfData() As Collection
 End Function
 
 
+Public Function getSuitableData() As Variant
+End Function
+
+
 
 
 

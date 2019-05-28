@@ -45,6 +45,10 @@ Private theLayout As ILayout
 Private repWorksheet As Worksheet
 Private repCell As Range
 
+Private ordersWorksheet As Worksheet
+Private orderCell As Range
+
+
 
 Private httpReq As HTTPRequestHandler
 
@@ -78,10 +82,14 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     ' -------------------------------------
 
     ' new rep
-    'Set repWorksheet = ThisWorkbook.Sheets.Add
-    'repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
-    'Set repCell = repWorksheet.Cells(2, 1)
-
+    Set repWorksheet = ThisWorkbook.Sheets.Add
+    repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
+    Set repCell = repWorksheet.Cells(2, 1)
+    
+    ' new order rep
+    Set ordersWorksheet = ThisWorkbook.Sheets.Add
+    ordersWorksheet.Cells(1, 1).Value = "Order list on Corail, new rep: " & CStr(Now)
+    Set orderCell = ordersWorksheet.Cells(2, 1)
 
     initialSetupForInputList ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM)
     
@@ -168,7 +176,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
         
             ' 2720
             ' --------------------------------------------------------------
-            Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
+            ' Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
             ' --------------------------------------------------------------
             
@@ -180,18 +188,56 @@ Private Sub makeInteration(ByRef inputRef As Range)
             Set theCorailData = theCorail.getDataFromScreen(2510, plt, pn)
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
             
+            Dim suit As SuitableData2510, oi As OrderItem
+            Set suit = theCorailData.getSuitableData()
+            
+            
+            Dim r As Range
+            
+            
+            Set r = orderCell.Offset(1, 0)
+            
+            Debug.Print "suit.getOrders() count: " & suit.getOrders().Count
+            
+            For Each oi In suit.getOrders()
+            
+                r.Value = plt
+                r.Offset(0, 1) = pn
+                r.Offset(0, 2) = oi.getElement(E_2510_PRODUCT)
+                r.Offset(0, 3) = oi.getElement(E_2510_SGR_LINE)
+                r.Offset(0, 4) = oi.getElement(E_2510_QTY)
+                r.Offset(0, 5) = oi.getElement(E_2510_ORDER_NUMBER)
+                r.Offset(0, 6) = oi.getElement(E_2510_DN)
+                r.Offset(0, 7) = oi.getElement(E_2510_DH).DHEO
+                r.Offset(0, 8) = oi.getElement(E_2510_DH).DHEF
+                r.Offset(0, 9) = oi.getElement(E_2510_DH).DHXC
+                r.Offset(0, 10) = oi.getElement(E_2510_DH).DHAS
+                r.Offset(0, 11) = oi.getElement(E_2510_DH).DHRQ
+                r.Offset(0, 12) = oi.getElement(E_2510_SELLER)
+                r.Offset(0, 13) = oi.getElement(E_2510_SHIPPER)
+                r.Offset(0, 14) = oi.getElement(E_2510_S2)
+                
+                
+                Set r = r.Offset(1, 0)
+            Next oi
+            
+            
+            Set orderCell = r
+            
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
             'fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
-            Dim DH As DOMHandler
-            i = 1
+            'Dim DH As DOMHandler
+            'i = 1
             'For Each txt In theCorailData.getCollectionOfData()
             '    fso.makeHtmlFile "t2510_" & "_" & i & "_" & plt & "_" & pn, CStr(txt)
             '    i = i + 1
             'Next txt
             ' Debug.Print theCorailData.getCollectionOfData().Count
             
+            
+            ' but this is really raw data without any setup at all
             i = 1
             For Each item In theCorailData.getCollectionOfData()
                 ' Debug.Print TypeName(item)  ' String OK

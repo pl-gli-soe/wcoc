@@ -32,5 +32,31 @@ Attribute VB_Exposed = False
 
 
 
+' SUITABLE DATA FROM 2510
 
 
+
+Private o As OrderItem
+Private orders As Collection
+
+
+
+
+Public Function getOrders() As Collection
+    Set getOrders = orders
+End Function
+
+
+Public Sub addOrder(arg As OrderItem)
+    orders.Add arg
+End Sub
+
+
+
+Private Sub Class_Initialize()
+    Set orders = New Collection
+End Sub
+
+Private Sub Class_Terminate()
+    Set orders = Nothing
+End Sub

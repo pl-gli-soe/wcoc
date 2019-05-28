@@ -62,7 +62,7 @@ Private Sub Class_Initialize()
     Set scr2720 = New Corail_2720_Screen
     Set scr2510 = New Corail_2510_Screen
     Set httpReqRef = Nothing
-    Set theCorailData = New CorailData
+    Set theCorailData = Nothing
 End Sub
 
 Private Sub Class_Terminate()
@@ -109,7 +109,7 @@ Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As
         Set ICorail_getDataFromScreen = scr2720.getData(pltCode, partNumber) ' As ICorailData
     ElseIf numberOfScreen = 2510 Then
         scr2510.screenSetup numberOfScreen, httpReqRef
-        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC) ' As ICorailData
+        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, E_TYPE_OF_DATA_FROM_CORAIL_DEFAULT) ' As ICorailData
     End If
     
     ' ----------------------------------------------------------------------------------

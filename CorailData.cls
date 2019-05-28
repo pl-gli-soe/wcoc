@@ -69,6 +69,10 @@ Private Function ICorailData_getString() As String
     ICorailData_getString = CStr(rawString)
 End Function
 
+Private Function ICorailData_getSuitableData() As Variant
+    Set ICorailData_getSuitableData = Nothing
+End Function
+
 Private Sub ICorailData_parseString()
 
 
