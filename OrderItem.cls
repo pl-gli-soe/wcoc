@@ -57,6 +57,7 @@ Private routing As String
 Private d As String
 
 Private status As String
+Private typeOfOrder As String
 Private UM As String
 
 ''
@@ -98,18 +99,18 @@ Public Sub coforConstructor(mSellerCofor As String, mShipperCofor As String)
     coforIsReady = True
  End Sub
 
-Public Sub commonConstructor(mSgrLine As String, mPn As String, mQty As Double, mOrderNum As String, mDn As String, mS1 As String, mRouting As String, mD As String, mS2 As String, mUm As String)
+Public Sub commonConstructor(arr() As String, doubledQty As Double)
 
-    SgrLine = CStr(mSgrLine)
-    pn = CStr(mPn)
-    qty = CDbl(mQty)
-    orderNum = CStr(mOrderNum)
-    DN = CStr(mDn)
-    S1 = CStr(mS1)
-    routing = CStr(mRouting)
-    d = CStr(mD)
-    status = CStr(mS2)
-    UM = CStr(mUm)
+    SgrLine = CStr(arr(WCOC.E_2510_SGR_LINE))
+    pn = CStr(arr(WCOC.E_2510_PRODUCT))
+    qty = CDbl(doubledQty)
+    orderNum = CStr(arr(WCOC.E_2510_ORDER_NUMBER))
+    DN = CStr(arr(WCOC.E_2510_DN))
+    routing = CStr(arr(WCOC.E_2510_ROUTING))
+    d = CStr(arr(WCOC.E_2510_D))
+    status = CStr(arr(WCOC.E_2510_S2))
+    typeOfOrder = CStr(arr(WCOC.E_2510_TYPE))
+    UM = CStr(arr(WCOC.E_2510_UM))
     
     
     commonDataIsReady = True
@@ -133,28 +134,50 @@ Public Function getElement(whichElement As E_2510_ELEMENT) As Variant
     Select Case whichElement
         Case E_2510_ELEMENT.E_2510_D
             getElement = CStr(d)
-        Case E_2510_ELEMENT.E_2510_DH
-            Set getElement = DH
+            
+        Case E_2510_ELEMENT.E_2510_DHAS
+            getElement = DH.DHAS
+            
+        Case E_2510_ELEMENT.E_2510_DHEF
+            getElement = DH.DHEF
+            
+        Case E_2510_ELEMENT.E_2510_DHEO
+            getElement = DH.DHEO
+            
+        Case E_2510_ELEMENT.E_2510_DHRQ
+            getElement = DH.DHRQ
+            
+            
         Case E_2510_ELEMENT.E_2510_DN
             getElement = CStr(DN)
+            
         Case E_2510_ELEMENT.E_2510_ORDER_NUMBER
             getElement = CStr(orderNum)
+            
         Case E_2510_ELEMENT.E_2510_PRODUCT
             getElement = CStr(pn)
+            
         Case E_2510_ELEMENT.E_2510_QTY
             getElement = CDbl(qty)
+            
         Case E_2510_ELEMENT.E_2510_ROUTING
             getElement = CStr(routing)
-        Case E_2510_ELEMENT.E_2510_S1
-            getElement = CStr(S1)
+            
         Case E_2510_ELEMENT.E_2510_S2
             getElement = CStr(status)
+            
         Case E_2510_ELEMENT.E_2510_SELLER
             getElement = CStr(sellerCofor)
+            
         Case E_2510_ELEMENT.E_2510_SGR_LINE
             getElement = CStr(SgrLine)
+            
         Case E_2510_ELEMENT.E_2510_SHIPPER
             getElement = CStr(shipperCofor)
+            
+        Case E_2510_ELEMENT.E_2510_TYPE
+            getElement = CStr(typeOfOrder)
+            
         Case E_2510_ELEMENT.E_2510_UM
             getElement = CStr(UM)
         Case Else

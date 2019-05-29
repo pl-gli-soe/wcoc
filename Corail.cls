@@ -97,7 +97,7 @@ Private Function ICorail_connectWithScreen(numberOfScreen As Variant) As Boolean
     
 End Function
 
-Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As Variant, partNumber As Variant) As ICorailData
+Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As Variant, partNumber As Variant, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 
 
     ' 90% of the implementation of this class
@@ -109,7 +109,8 @@ Private Function ICorail_getDataFromScreen(numberOfScreen As Variant, pltCode As
         Set ICorail_getDataFromScreen = scr2720.getData(pltCode, partNumber) ' As ICorailData
     ElseIf numberOfScreen = 2510 Then
         scr2510.screenSetup numberOfScreen, httpReqRef
-        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, E_TYPE_OF_DATA_FROM_CORAIL_DEFAULT) ' As ICorailData
+        ' Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC_WITH_FORECAST) ' As ICorailData
+        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, e) ' As ICorailData
     End If
     
     ' ----------------------------------------------------------------------------------

@@ -38,7 +38,7 @@ End Function
 Public Function connectWithScreen(numberOfScreen) As Boolean
 End Function
 
-Public Function getDataFromScreen(numberOfScreen, pltCode, partNumber) As ICorailData
+Public Function getDataFromScreen(numberOfScreen, pltCode, partNumber, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 End Function
 
 

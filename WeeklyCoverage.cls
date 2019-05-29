@@ -90,6 +90,8 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     Set ordersWorksheet = ThisWorkbook.Sheets.Add
     ordersWorksheet.Cells(1, 1).Value = "Order list on Corail, new rep: " & CStr(Now)
     Set orderCell = ordersWorksheet.Cells(2, 1)
+    fillWithLabels ordersWorksheet, orderCell
+    Set orderCell = orderCell.Offset(1, 0)
 
     initialSetupForInputList ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM)
     
@@ -171,13 +173,20 @@ Private Sub makeInteration(ByRef inputRef As Range)
     If httpReq.usable() Then
         
         theCorail.connectWithHttpReq httpReq
+        httpReq.httpGet "http://" & plt & ".commons.erp.corail.inetpsa.com/rest/sts-i18n/locales/en-US"
     
         If theCorail.connectWithScreen(2720) Then
         
             ' 2720
             ' --------------------------------------------------------------
-            ' Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
+            Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
+            
+            Dim suitableDataFrom2720 As SuitableData2720, ci As CoverageItem
+            Set suitableDataFrom2720 = theCorailData.getSuitableData()
+            
+            Debug.Print "suitableDataFrom2720.stock: " & suitableDataFrom2720.stock
+            
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
@@ -185,37 +194,39 @@ Private Sub makeInteration(ByRef inputRef As Range)
             
             ' 2510
             ' --------------------------------------------------------------
-            Set theCorailData = theCorail.getDataFromScreen(2510, plt, pn)
+            Set theCorailData = theCorail.getDataFromScreen(2510, plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC)
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
             
-            Dim suit As SuitableData2510, oi As OrderItem
-            Set suit = theCorailData.getSuitableData()
+            Dim suitableDataCalcFrom2510 As SuitableData2510, oi As OrderItem
+            Set suitableDataCalcFrom2510 = theCorailData.getSuitableData()
             
             
             Dim r As Range
             
             
-            Set r = orderCell.Offset(1, 0)
+            Set r = orderCell
             
-            Debug.Print "suit.getOrders() count: " & suit.getOrders().Count
+            Debug.Print "suit.getOrders() count: " & suitableDataCalcFrom2510.getOrders().Count
             
-            For Each oi In suit.getOrders()
             
-                r.Value = plt
-                r.Offset(0, 1) = pn
-                r.Offset(0, 2) = oi.getElement(E_2510_PRODUCT)
-                r.Offset(0, 3) = oi.getElement(E_2510_SGR_LINE)
-                r.Offset(0, 4) = oi.getElement(E_2510_QTY)
-                r.Offset(0, 5) = oi.getElement(E_2510_ORDER_NUMBER)
-                r.Offset(0, 6) = oi.getElement(E_2510_DN)
-                r.Offset(0, 7) = oi.getElement(E_2510_DH).DHEO
-                r.Offset(0, 8) = oi.getElement(E_2510_DH).DHEF
-                r.Offset(0, 9) = oi.getElement(E_2510_DH).DHXC
-                r.Offset(0, 10) = oi.getElement(E_2510_DH).DHAS
-                r.Offset(0, 11) = oi.getElement(E_2510_DH).DHRQ
-                r.Offset(0, 12) = oi.getElement(E_2510_SELLER)
-                r.Offset(0, 13) = oi.getElement(E_2510_SHIPPER)
-                r.Offset(0, 14) = oi.getElement(E_2510_S2)
+            
+            For Each oi In suitableDataCalcFrom2510.getOrders()
+            
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_PLT) = plt
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_PN) = oi.getElement(E_2510_PRODUCT)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_SGR) = oi.getElement(E_2510_SGR_LINE)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_QTY) = oi.getElement(E_2510_QTY)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_ORDER_NUM) = oi.getElement(E_2510_ORDER_NUMBER)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_DN) = oi.getElement(E_2510_DN)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEO) = oi.getElement(E_2510_DHEO)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEF) = oi.getElement(E_2510_DHEF)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHAS) = oi.getElement(E_2510_DHAS)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHRQ) = oi.getElement(E_2510_DHRQ)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_SELLER) = oi.getElement(E_2510_SELLER)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_SHIPPER) = oi.getElement(E_2510_SHIPPER)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_TYPE) = oi.getElement(E_2510_TYPE)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_UM) = oi.getElement(E_2510_UM)
+                r.Offset(0, WCOC.E_ORDER_LIST_REP_STATUS) = oi.getElement(E_2510_S2)
                 
                 
                 Set r = r.Offset(1, 0)
@@ -273,4 +284,28 @@ Private Sub initialSetupForInputList(ish As Worksheet)
     '
     ''
     ' ================================================================================================
+End Sub
+
+
+Private Sub fillWithLabels(osh As Worksheet, refRange As Range)
+
+
+    Dim r As Range
+    Set r = refRange
+
+    r.Offset(0, E_ORDER_LIST_PLT).Value = "PLT"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_PN) = "PN"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_SGR) = "SGR LINE"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_QTY) = "QTY"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_ORDER_NUM) = "Order#"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_DN) = "DN"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEO) = "DHEO"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEF) = "DHEF"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_DHAS) = "DHAS"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_DHRQ) = "DHRQ"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_SELLER) = "SELLER"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_SHIPPER) = "SHIPPER"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_TYPE) = "TYPE"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_UM) = "UM"
+    r.Offset(0, WCOC.E_ORDER_LIST_REP_STATUS) = "STATUS"
 End Sub

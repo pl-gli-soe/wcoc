@@ -84,7 +84,7 @@ Private Sub Class_Initialize()
     
     
     strona = 1
-    ileLiniiNaStronie = 20
+    ileLiniiNaStronie = 40
     
     screenUrl = "/getOrderViewPager.do"
             
@@ -138,17 +138,34 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Op
         
             ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
             url = "http://" & CStr(plt) & preUrl & screenUrl
-            args = makeSomeArgsForMe("CALCULATED", partNumber, ktoraStrona)
+            args = makeSomeArgsForMe("CALCULATED", partNumber, ktoraStrona, False)
             
             Debug.Print "http post: " & url & " " & args
             answer = req.httpPost(url, args)
             
+            ' but for this example this set is actually add!!!
             theCorailData.setString answer
             
-            ' after loop, when all data collected
-            'theCorailData.parseString
-            'Set ICorailScreen_getData = theCorailData
             ' -----------------------------------------------------------------------------
+            
+        ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC_WITH_FORECAST Then
+        
+            ' CALCULATED WIth FORECAST
+            ' -----------------------------------------------------------------------------
+        
+        
+            ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
+            url = "http://" & CStr(plt) & preUrl & screenUrl
+            args = makeSomeArgsForMe("CALCULATED", partNumber, ktoraStrona, True)
+            
+            Debug.Print "http post: " & url & " " & args
+            answer = req.httpPost(url, args)
+            
+            ' but for this example this set is actually add!!!
+            theCorailData.setString answer
+            
+            ' -----------------------------------------------------------------------------
+        
         
         ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2510_UPDATED Then
         
@@ -160,35 +177,40 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Op
             args = makeSomeArgsForMe("UPDATED", partNumber, ktoraStrona)
             answer = req.httpPost(url, args)
             
+            ' but for this example this set is actually add!!!
             theCorailData.setString answer
             
-            ' after loop, when all data collected
-            'theCorailData.parseString
-            'Set ICorailScreen_getData = theCorailData
             ' -----------------------------------------------------------------------------
             
-        Else
-            ' sth is wrong
-            'Debug.Print "This type of data for this screen is not available: ICorailScreen_getData 2510 class: Corail_2510_Screen line: 94"
-            'Set ICorailScreen_getData = Nothing
-            
-            ' bez rozroznienia jesli chodzi czy updated, czy calculated
-            
-            ' ALL
+        ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2510_UPDATED_WITH_FORECAST Then
+        
+            ' UPDATED WITH FORECAST
             ' -----------------------------------------------------------------------------
             
             ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
             url = "http://" & CStr(plt) & preUrl & screenUrl
-            args = makeSomeArgsForMe("", partNumber, ktoraStrona)
+            args = makeSomeArgsForMe("UPDATED", partNumber, ktoraStrona, True)
+            answer = req.httpPost(url, args)
+            
+            ' but for this example this set is actually add!!!
+            theCorailData.setString answer
+            
+            ' -----------------------------------------------------------------------------
+            
+        Else
+            
+            ' CALCULATED WITHOUT FORECAST BY DEFAULT
+            ' -----------------------------------------------------------------------------
+            
+            ' not dry, but i want to this - to see exactly what is going on close betweeen the lines
+            url = "http://" & CStr(plt) & preUrl & screenUrl
+            args = makeSomeArgsForMe("CALCULATED", partNumber, ktoraStrona, False)
             answer = req.httpPost(url, args)
             
             
             ' but for this example this set is actually add!!!
             theCorailData.setString answer
             
-            ' after loop, when all data collected
-            'theCorailData.parseString
-            'Set ICorailScreen_getData = theCorailData
             ' -----------------------------------------------------------------------------
         End If
         
@@ -282,18 +304,26 @@ End Function
 
 
 
-Private Function makeSomeArgsForMe(arg, partNumber, ktoraStrona) As String
+Private Function makeSomeArgsForMe(arg, partNumber, ktoraStrona, Optional forecast As Boolean) As String
     
     ' arg - updated or calculated - but at the end will have same url from contruction perspective
     ' becuae all rest in baiscally the same dates and other params
     
+    ' arg: UPDATED -> SHIPPED
+    ' arg: CALCULATED -> ORDER
     
-    ' template
+    ' comment regarding order:
+    ' need extra param on status: CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:AN ' do not know why...
+    
+    
+    ' example template
     'args = "page=1&max=256&charset=UTF-8&ecwAutoId=false&ecwDivId=orderView&statusList=EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:ST" & _
     '    "&eventType=RQ&forecast=false&logisticObjectTypeCode=CALCULATED&displayLocal=false&productCode=9810867580"
     
     ' pod ordery! 209-05-28
-    ' CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:AN
+    ' &statusList=CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:AN
+    ' ? FO:CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:BL:AN
+    
     
     
     thisStartDate = parseFromDate(1)
@@ -303,29 +333,67 @@ Private Function makeSomeArgsForMe(arg, partNumber, ktoraStrona) As String
     
     
     Dim tmp As String
-
-
-    If arg <> "" Then
-
-        tmp = "page=" & ktoraStrona & _
-            "&max=" & ileLiniiNaStronie & _
-            "&charset=UTF-8" & _
-            "&forecast=false" & _
-            "&logisticObjectTypeCode=" & arg & _
-            "&eventType=RQ" & _
-            thisStartDate & thisEndDate & _
-            "&productCode=" & partNumber
+    
+    If forecast Then
+    
+    
+        If arg <> "" Then
+    
+            tmp = "page=" & ktoraStrona & _
+                "&max=" & ileLiniiNaStronie & _
+                "&charset=UTF-8" & _
+                "&forecast=true" & _
+                "&logisticObjectTypeCode=" & arg & _
+                "&displayLocal=false" & _
+                "&statusList=FO:CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:BL:AN" & _
+                "&eventType=RQ" & _
+                thisStartDate & thisEndDate & _
+                "&productCode=" & partNumber
+        
+        Else
+        
+            tmp = "page=" & ktoraStrona & _
+                "&max=" & ileLiniiNaStronie & _
+                "&charset=UTF-8" & _
+                "&forecast=true" & _
+                "&displayLocal=false" & _
+                "&statusList=FO:CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:BL:AN" & _
+                "&eventType=RQ" & _
+                thisStartDate & thisEndDate & _
+                "&productCode=" & partNumber
+        
+        End If
+    
     
     Else
+
+
+        If arg <> "" Then
     
-        tmp = "page=" & ktoraStrona & _
-            "&max=" & ileLiniiNaStronie & _
-            "&charset=UTF-8" & _
-            "&forecast=true" & _
-            "&eventType=RQ" & _
-            thisStartDate & thisEndDate & _
-            "&productCode=" & partNumber
-    
+            tmp = "page=" & ktoraStrona & _
+                "&max=" & ileLiniiNaStronie & _
+                "&charset=UTF-8" & _
+                "&forecast=false" & _
+                "&logisticObjectTypeCode=" & arg & _
+                "&displayLocal=false" & _
+                "&statusList=FO:CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:BL:AN" & _
+                "&eventType=RQ" & _
+                thisStartDate & thisEndDate & _
+                "&productCode=" & partNumber
+        
+        Else
+        
+            tmp = "page=" & ktoraStrona & _
+                "&max=" & ileLiniiNaStronie & _
+                "&charset=UTF-8" & _
+                "&forecast=false" & _
+                "&displayLocal=false" & _
+                "&statusList=FO:CA:EO:EF:XC:RP:XP:DT:AT:EP:AS:RQ:IN_CD:ST:BL:AN" & _
+                "&eventType=RQ" & _
+                thisStartDate & thisEndDate & _
+                "&productCode=" & partNumber
+        
+        End If
     End If
     
     makeSomeArgsForMe = tmp
@@ -350,8 +418,6 @@ Function parseFromDate(i As Integer)
     Dim d1 As Date, d2 As Date
     d1 = Date - 30
     d2 = Date + 140
-    
-    
     
     If i = 1 Then
         
