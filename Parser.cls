@@ -147,14 +147,18 @@ Private Sub innerParse2510()
         Dim oItem As OrderItem
         
         
-        ' temps vars
+        ' temps vars - really ugly - i know
         ' --------------------------------------------------------------------------------------------------
         ' --------------------------------------------------------------------------------------------------
         
-        Dim tmpStrSgrLine As String, tmpStrPn As String, tmpStrQty As String, tmpStrOrderNum As String
-        Dim tmpStrDn As String, tmpStrDHEO As String, tmpStrDHEF As String, tmpStrDHXC As String
-        Dim tmpStrDHAS As String, tmpStrDHRQ As String, tmpStrS1 As String, tmpStrRouting As String
-        Dim tmpStrD As String, tmpStrSeller As String, tmpStrShipper As String, tmpStrS2 As String, tmpStrUM As String
+        Dim tmpStrArr(WCOC.E_2510_CONSULT_ICON To WCOC.E_2510_UM) As String
+        
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        Dim tmpColIndxArr(WCOC.E_2510_CONSULT_ICON To WCOC.E_2510_UM)
+        For xx = WCOC.E_2510_CONSULT_ICON To WCOC.E_2510_UM
+            tmpColIndxArr(xx) = -1
+        Next xx
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         
         Dim tmpDH_Handler As DH_Handler
         
@@ -191,7 +195,6 @@ Private Sub innerParse2510()
 
             Set t = parentDivTable.getElementsByTagName("table")(0)
         
-        
             For Each r In t.Rows
             
                 Set oItem = Nothing
@@ -200,23 +203,10 @@ Private Sub innerParse2510()
                 
                 ' init by empty
                 ' ----------------------------------------------
-                tmpStrSgrLine = ""
-                tmpStrPn = ""
-                tmpStrQty = ""
-                tmpStrOrderNum = ""
-                tmpStrDn = ""
-                tmpStrDHEO = ""
-                tmpStrDHEF = ""
-                tmpStrDHXC = ""
-                tmpStrDHAS = ""
-                tmpStrDHRQ = ""
-                tmpStrS1 = ""
-                tmpStrRouting = ""
-                tmpStrD = ""
-                tmpStrSeller = ""
-                tmpStrShipper = ""
-                tmpStrS2 = ""
-                tmpStrUM = ""
+                'Dim tmpStrArr(WCOC.E_2510_CONSULT_ICON To WCOC.E_2510_UM) As String
+                For i = WCOC.E_2510_CONSULT_ICON To WCOC.E_2510_UM
+                    tmpStrArr(i) = ""
+                Next i
                 
                 Set tmpDH_Handler = New DH_Handler
                 ' ----------------------------------------------
@@ -232,68 +222,70 @@ Private Sub innerParse2510()
                     ' ...
                     ' <TH>Seller </TH>, class:  inner: Seller  tag: TH
                     ' <TH>Shipper </TH>, class:  inner: Shipper  tag: TH
+                    If c.tagName = "TH" Then
+                        ' catch the order of columns
+                        ' ---------------------------------
+                        
+                        If Left(c.innerHTML, 3) = "SGR" Then tmpColIndxArr(WCOC.E_2510_SGR_LINE) = i
+                        If c.innerHTML = "Product" Or c.innerHTML = "Produit" Then tmpColIndxArr(WCOC.E_2510_PRODUCT) = i
+                        If Left(c.innerHTML, 2) = "Qt" Then tmpColIndxArr(WCOC.E_2510_QTY) = i
+                        If c.innerHTML = "Order number" Or c.innerHTML Like "*Ordre" Then tmpColIndxArr(WCOC.E_2510_ORDER_NUMBER) = i
+                        If c.innerHTML = "DN" Then tmpColIndxArr(WCOC.E_2510_DN) = i
+                        
+                        If c.innerHTML = "DHCA" Then tmpColIndxArr(WCOC.E_2510_DHCA) = i
+                        If c.innerHTML = "DHEF" Then tmpColIndxArr(WCOC.E_2510_DHEF) = i
+                        If c.innerHTML = "DHEO" Then tmpColIndxArr(WCOC.E_2510_DHEO) = i
+                        If c.innerHTML = "DHRQ" Then tmpColIndxArr(WCOC.E_2510_DHRQ) = i
+                        If c.innerHTML = "DHAS" Then tmpColIndxArr(WCOC.E_2510_DHAS) = i
+                        
+                        If c.innerHTML = "Routing" Or c.innerHTML = "Routage" Then tmpColIndxArr(WCOC.E_2510_ROUTING) = i
+                        If Trim(c.innerHTML) = "Seller" Or c.innerHTML = "Vendeur" Then tmpColIndxArr(WCOC.E_2510_SELLER) = i
+                        If Trim(c.innerHTML) = "Shipper" Or (Left(c.innerHTML, 3) = "Exp" And Right(c.innerHTML, 4) = "teur") Then tmpColIndxArr(WCOC.E_2510_SHIPPER) = i
+                        If Trim(c.innerHTML) = "S" Then tmpColIndxArr(WCOC.E_2510_S2) = i
+                        If Trim(c.innerHTML) = "Type" Then tmpColIndxArr(WCOC.E_2510_TYPE) = i
+                        If Trim(c.innerHTML) = "UM" Then tmpColIndxArr(WCOC.E_2510_UM) = i
+
+                        
+                        
+                        ' ---------------------------------
+                    End If
+                    
+                    
                     If c.tagName = "TD" Then
                         Set divTempElement = c.getElementsByTagName("div")(0)
                         
                         ' Debug.Print "c.getElementsByTagName(div)(0) > o: " & divTempElement.outerHTML & " i: " & divTempElement.innerHTML
                         
-                        ' 1 &nbsp (consult button)
-                        
-                        ' 2 <DIV class=text>891/9</DIV> (SGR LIne)
-                        If i = 2 Then tmpStrSgrLine = CStr(divTempElement.innerHTML)
-                        
-                        ' 3 <DIV class="ecwButtonTexteOver text">9810867580</DIV> i: 9810867580 (PN)
-                        If i = 3 Then tmpStrPn = CStr(divTempElement.innerHTML)
-                        
-                        ' 4 <DIV class=number>720.0</DIV> i: 720.0 (Qty)
-                        If i = 4 Then
-                            tmpStrQty = CStr(divTempElement.innerHTML)
+                        ' &nbsp (consult button)
+                        If i = tmpColIndxArr(WCOC.E_2510_SGR_LINE) Then tmpStrArr(WCOC.E_2510_SGR_LINE) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_PRODUCT) Then tmpStrArr(WCOC.E_2510_PRODUCT) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_QTY) Then
+                            tmpStrArr(WCOC.E_2510_QTY) = CStr(divTempElement.innerHTML)
                         End If
+                        If i = tmpColIndxArr(WCOC.E_2510_ORDER_NUMBER) Then tmpStrArr(WCOC.E_2510_ORDER_NUMBER) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_DN) Then tmpStrArr(E_2510_DN) = CStr(divTempElement.innerHTML)
                         
-                        ' 5 <DIV class=text>004010222</DIV> i: 004010222 (order num)
-                        If i = 5 Then tmpStrOrderNum = CStr(divTempElement.innerHTML)
+
+                        ' DHXX here
+                        ' --------------------------------------------------------------------------
                         
-                        ' 6 <DIV class=text>69206418</DIV> i: 69206418 (dn)
-                        If i = 6 Then tmpStrDn = CStr(divTempElement.innerHTML)
-                        
-                        ' 7 <DIV class=date>19/05/21 08:50</DIV> i: 19/05/21 08:50 (DHEO)
-                        ' 8 <DIV class=date>19/05/23 14:00</DIV> i: 19/05/23 14:00 (DHEF)
-                        ' 9 <DIV class=date>&nbsp;</DIV> i: &nbsp; (DHXC)
-                        ' 10 <DIV class=date>19/05/28 10:20</DIV> i: 19/05/28 10:20 (DHAS)
-                        ' 11 <DIV class=date>19/05/28 11:30</DIV> i: 19/05/28 11:30 (DHRQ)
-                        If i >= 7 And i <= 11 Then
-                            ' all DHXX here
-                            ' --------------------------------------------------------------------------
-                            
-                            If i = 7 Then tmpStrDHEO = CStr(divTempElement.innerHTML)
-                            If i = 8 Then tmpStrDHEF = CStr(divTempElement.innerHTML)
-                            If i = 9 Then tmpStrDHXC = CStr(divTempElement.innerHTML)
-                            If i = 10 Then tmpStrDHAS = CStr(divTempElement.innerHTML)
-                            If i = 11 Then tmpStrDHRQ = CStr(divTempElement.innerHTML)
-                            ' --------------------------------------------------------------------------
-                        End If
-                        
-                        ' 12 <DIV class=text>3383</DIV> i: 3383 (S (1))
-                        If i = 12 Then tmpStrS1 = CStr(divTempElement.innerHTML)
-                        
-                        ' 13 <DIV class=text>L9 FBC</DIV> i: L9 FBC (routing)
-                        If i = 13 Then tmpStrRouting = CStr(divTempElement.innerHTML)
-                        
-                        ' 14 <DIV class=text>TC2</DIV> i: TC2 (D)
-                        If i = 14 Then tmpStrD = CStr(divTempElement.innerHTML)
-                        
-                        ' 15 <DIV class=text>94656L 01</DIV> i: 94656L 01 (SELLER)
-                        If i = 15 Then tmpStrSeller = CStr(divTempElement.innerHTML)
-                        
-                        ' 16 <DIV class=text>94656L 02</DIV> i: 94656L 02 (SHIPPER)
-                        If i = 16 Then tmpStrShipper = CStr(divTempElement.innerHTML)
-                        
-                        ' 17 <DIV class="text RED">EF</DIV> i: EF (s (2) status)
-                        If i = 17 Then tmpStrS2 = CStr(divTempElement.innerHTML)
-                        
-                        ' 18 <DIV class=text>20308</DIV> i: 20308 (UM)
-                        If i = 18 Then
-                            tmpStrUM = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_DHEO) Then tmpStrArr(WCOC.E_2510_DHEO) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_DHEF) Then tmpStrArr(WCOC.E_2510_DHEF) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_DHAS) Then tmpStrArr(WCOC.E_2510_DHAS) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_DHRQ) Then tmpStrArr(WCOC.E_2510_DHRQ) = CStr(divTempElement.innerHTML)
+                        ' --------------------------------------------------------------------------
+                                                
+
+                        If i = tmpColIndxArr(WCOC.E_2510_ROUTING) Then tmpStrArr(WCOC.E_2510_ROUTING) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_D) Then tmpStrArr(WCOC.E_2510_D) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_SELLER) Then tmpStrArr(WCOC.E_2510_SELLER) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_SHIPPER) Then tmpStrArr(WCOC.E_2510_SHIPPER) = CStr(divTempElement.innerHTML)
+                        '(status)
+                        If i = tmpColIndxArr(WCOC.E_2510_S2) Then tmpStrArr(WCOC.E_2510_S2) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_2510_TYPE) Then tmpStrArr(WCOC.E_2510_TYPE) = CStr(divTempElement.innerHTML)
+                        ' (UM the last one)
+                        If i = tmpColIndxArr(WCOC.E_2510_UM) Then
+                            tmpStrArr(WCOC.E_2510_UM) = CStr(divTempElement.innerHTML)
                             
                             
                             
@@ -307,36 +299,33 @@ Private Sub innerParse2510()
                             Set tmpDH_Handler = Nothing
                             Set tmpDH_Handler = New DH_Handler
                             
-                            If checkIfDateAndTime(tmpStrDHEO) Then
-                                tmpDH_Handler.DHEO = parseStringToDateTime(tmpStrDHEO)
+                            If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHEO)) Then
+                                tmpDH_Handler.DHEO = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEO))
                             End If
                             
-                            If checkIfDateAndTime(tmpStrDHEF) Then
-                                tmpDH_Handler.DHEF = parseStringToDateTime(tmpStrDHEF)
+                            If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHEF)) Then
+                                tmpDH_Handler.DHEF = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEF))
                             End If
                             
-                            If checkIfDateAndTime(tmpStrDHXC) Then
-                                tmpDH_Handler.DHXC = parseStringToDateTime(tmpStrDHXC)
+                            
+                            If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHAS)) Then
+                                tmpDH_Handler.DHAS = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHAS))
                             End If
                             
-                            If checkIfDateAndTime(tmpStrDHAS) Then
-                                tmpDH_Handler.DHAS = parseStringToDateTime(tmpStrDHAS)
-                            End If
-                            
-                            If checkIfDateAndTime(tmpStrDHRQ) Then
-                                tmpDH_Handler.DHRQ = parseStringToDateTime(tmpStrDHRQ)
+                            If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHRQ)) Then
+                                tmpDH_Handler.DHRQ = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHRQ))
                             End If
                             
                             
                             Dim qtyAsDouble As Double
                             qtyAsDouble = 0
                             On Error Resume Next
-                            qtyAsDouble = CDbl(forceStringToBeDouble(tmpStrQty))
+                            qtyAsDouble = CDbl(forceStringToBeDouble(tmpStrArr(WCOC.E_2510_QTY)))
                             
                             With oItem
-                                .coforConstructor tmpStrSeller, tmpStrShipper
+                                .coforConstructor tmpStrArr(WCOC.E_2510_SELLER), tmpStrArr(WCOC.E_2510_SHIPPER)
                                 .dhConstructor tmpDH_Handler
-                                .commonConstructor tmpStrSgrLine, tmpStrPn, qtyAsDouble, tmpStrOrderNum, tmpStrDn, tmpStrS1, tmpStrRouting, tmpStrD, tmpStrS2, tmpStrUM
+                                .commonConstructor tmpStrArr, CDbl(qtyAsDouble)
                             End With
                             
                             

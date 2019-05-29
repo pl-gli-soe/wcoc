@@ -38,6 +38,25 @@ Attribute VB_Name = "VersionModule"
 'SOFTWARE.
 
 
+' version 0.07
+' update: 2019-05-29
+' ========================================================================================
+
+' komentarz dla implemnetacji i aranzu danych:
+' ST (past & today) + AN?
+' w obiekcie weekly coverage - wyrzucamy liste do excela
+' zakladam, ze jesli data na DHRQ jest do dzis + ma status ST
+' oznacza, ze material zostal przyjety - wiadomka w kolumnie order zostajemy z danymi...
+'
+' EF <=
+' in transit?
+' jesli mamy taki milestone (conajmniej), to znaczy, ze lecimy juz z materialem
+'
+' EO - order ino!
+
+' ========================================================================================
+
+
 
 ' version 0.06
 ' update: 2019-05-28
