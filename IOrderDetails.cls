@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ILayout"
+Attribute VB_Name = "IOrderDetails"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,12 +32,14 @@ Attribute VB_Exposed = False
 
 
 
+' this is an interface for scaffolding behavior for orders and shipments in final rep
+' helps to merge data from 2510 and 2720 screens from corail
+' connecting by date from DHRQ from ordered/ shipped with coverage d as Date
 
-Public Sub setLayout(typeOfLayout As E_TYPE_OF_LAYOUT)
+
+Public Sub findYourOrders(dataFrom2510 As SuitableData2510, covItem As CoverageItem)
 End Sub
 
-Public Sub putSomeColorsForThisPartNumber(r As Range)
-End Sub
+Public Function getCollectionOfOrders() As Collection
+End Function
 
-Public Sub nowMergeWithDataFromCorail(r As Range, main2720data As SuitableData2720)
-End Sub
