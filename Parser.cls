@@ -429,6 +429,12 @@ Private Sub innerParse2720()
         ' ---------------------------------------------------------------------
         
         
+        ' suitable data
+        ' ---------------------------------------------------------------------
+        Set inputElement = d.getDom.idoc.getElementById("receivedOnSite")
+        sd.recv = CDbl(forceStringToBeDouble(CStr(inputElement.Value)))
+        ' ---------------------------------------------------------------------
+        
         
         
         

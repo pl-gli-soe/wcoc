@@ -38,6 +38,16 @@ Attribute VB_Name = "VersionModule"
 'SOFTWARE.
 
 
+
+' version 0.08
+' update: 2019-05-30
+' ========================================================================================
+
+' first connection with WeeklyLayout which implements from ILayout - instance theLayout
+' final solution on excel rep
+
+' ========================================================================================
+
 ' version 0.07
 ' update: 2019-05-29
 ' ========================================================================================

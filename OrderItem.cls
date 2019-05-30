@@ -52,7 +52,7 @@ Private qty As Double
 Private orderNum As String
 Private DN As String
 
-Private S1 As String
+Private s1 As String
 Private routing As String
 Private d As String
 
