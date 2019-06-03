@@ -46,11 +46,27 @@ Attribute VB_Exposed = False
 Private d As Date
 Private pcDemand As Double
 Private incBc As Double
+
+' calc
 Private ordered As Double
+Private orderItemDetails As IOrderDetails
+' updated
 Private shipped As Double
 
 
 Private ready As Boolean
+
+
+
+Public Function getOrdersCollection() As Collection
+    
+    Set getOrdersCollection = orderItemDetails.getCollectionOfOrders()
+End Function
+
+
+Public Sub setOrderDetails(arg As IOrderDetails)
+    Set orderItemDetails = arg
+End Sub
 
 Public Sub makeReady()
     ready = True
@@ -112,5 +128,7 @@ Private Sub Class_Initialize()
     ordered = 0
     shipped = 0
     ready = False
+    
+    Set orderItemDetails = Nothing
 End Sub
 

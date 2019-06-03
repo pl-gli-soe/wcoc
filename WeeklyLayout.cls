@@ -40,6 +40,13 @@ Private coverCols As Integer
 Private S As Worksheet
 
 
+Private dataFromCorail As SuitableData2720
+
+
+Private LAYOUT_2510_LABEL As String
+
+
+
 Private Sub Class_Initialize()
 
     ' layoutType
@@ -48,93 +55,327 @@ Private Sub Class_Initialize()
     layoutType = E_TYPE_OF_LAYOUT_WEEKLY_UNDEFINED
     '
     ''
+    Set dataFromCorail = Nothing
+    
+    
+    LAYOUT_2510_LABEL = "QTY SELLER      SHIPPER    TYPE  ST  DHEO                       DHRQ                        " & Chr(10)
 
+End Sub
+
+Private Sub ILayout_finalTouchOnRep(rep As Worksheet)
+    
+    rep.Columns("A:A").ColumnWidth = 4
+    rep.Columns("B:B").ColumnWidth = 17
+    rep.Columns("C:C").ColumnWidth = 8
+    rep.Columns("D:D").ColumnWidth = 1
+    rep.Columns("J:AC").ColumnWidth = 6
+    
+    rep.Activate
+End Sub
+
+Private Sub ILayout_nowMergeWithDataFromCorail(r As Range, main2720data As SuitableData2720)
+    Set dataFromCorail = main2720data
 End Sub
 
 Private Sub ILayout_putSomeColorsForThisPartNumber(r As Range)
 
 
-    Set area = getAreaBasedOn(r)
-    Set S = area.Parent
-    rrow = r.Row
+    If Not dataFromCorail Is Nothing Then
+
+
+        Set area = getAreaBasedOn(r)
+        Set S = area.Parent
+        rrow = r.Row
+        
+        coverCols = 20
+        
+        pFormatCommonDataOnLeft S, CLng(rrow)
+        
+        
+        
+        
     
-    coverCols = 20
+        Dim cwr As Range
+        Dim d1 As Date, d2 As Date, refRqm As Range, refOrder As Range, refShipment As Range
+        
+        ' Najpierw wpisz daty
+        For x = 0 To coverCols - 1
+            
+            ' obsolete implementation
+            ' s.Cells(rrow, x + 10).Value = IsoWeekNumber(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
+            
+            ' using instead built-in iso week num foo directly from worksheet functions
+            S.Cells(rrow, x + 10).Value = Application.WorksheetFunction.IsoWeekNum(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
+            
+            Set cwr = S.Cells(rrow, x + 10)
+            Set refRqm = cwr.Offset(1, 0)
+            Set refOrder = cwr.Offset(2, 0)
+            Set refShipment = cwr.Offset(3, 0)
+            
+            d1 = CDate(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1, "yyyy-mm-dd"))
+            d2 = CDate(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 7, "yyyy-mm-dd"))
+            
+            refRqm = getRqms(d1, d2, dataFromCorail)
+            refOrder = getOrdersAndPutSomeComment(refOrder, d1, d2, dataFromCorail)
+            refShipment = getShipmentsAndPutSomeComment(refShipment, d1, d2, dataFromCorail)
+            
+            cwr.AddComment CStr(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1, "dd-mm-yyyy") + " - " + Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 7, "dd-mm-yyyy"))
+            cwr.Comment.Shape.Width = 150
+            cwr.Comment.Shape.Height = 30
+        Next x
+        ' teraz formu³y - old school comment :D
+        ' R[-3]C - order - tego nie liczymy
+        
+
+        S.Cells(rrow + 5, 10).FormulaR1C1 = "=R[-4]C[-4]+R[-3]C[-1]+R[-2]C[-1]-R[-4]C+R[-2]C+R[-1]C"
+        
+        S.Cells(rrow + 5, 10).NumberFormat = "0_ ;[Red]-0 "
+        S.Cells(rrow + 5, 10).Font.Bold = True
+        S.Cells(rrow + 5, 10).Interior.Color = RGB(183, 222, 232)
+        
+
+        
+        
+        For x = 1 To coverCols - 1
+            ' R[-3]C - order - tego nie liczymy
+            ' S.Cells(rrow + 5, 10 + x).FormulaR1C1 = "=RC[-1]-R[-4]C+R[-3]C+R[-2]C+R[-1]C"
+            S.Cells(rrow + 5, 10 + x).FormulaR1C1 = "=RC[-1]-R[-4]C+R[-2]C+R[-1]C"
+            
+            S.Cells(rrow + 5, 10 + x).NumberFormat = "0_ ;[Red]-0 "
+            S.Cells(rrow + 5, 10 + x).Font.Bold = True
+            S.Cells(rrow + 5, 10 + x).Interior.Color = RGB(183, 222, 232)
+        Next x
+        
+        
+        
+    End If
     
+
+End Sub
+
+
+Private Function getOrdersAndPutSomeComment(rfr As Range, d1 As Date, d2 As Date, data As SuitableData2720) As Double
+
+    rfr.AddComment ""
+
+
+    getOrdersAndPutSomeComment = 0
+    
+    
+    Dim tmp As Double, ciDate As Date
+    tmp = 0
+    
+    Dim ci As CoverageItem
+    For Each ci In data.getCollectionOfItems()
+        
+        ciDate = ci.getDate()
+        Set cmnt = Nothing
+    
+        If CDate(d1) <= CDate(ciDate) And CDate(d2) >= CDate(ciDate) Then
+            tmp = tmp + CDbl(ci.getOrder())
+            
+            
+            Set ciOrdersColl = ci.getOrdersCollection()
+            
+            If Not ciOrdersColl Is Nothing Then
+                If ciOrdersColl.Count > 0 Then
+
+                    
+                    For Each oi In ciOrdersColl
+                    
+                        If rfr.Comment.Text = "" Then
+                            rfr.Comment.Text "" & LAYOUT_2510_LABEL
+                        End If
+                        
+                        rfr.Comment.Text "" & rfr.Comment.Text & oi.getElement(E_2510_QTY) & "  " & oi.getElement(E_2510_SELLER) & " " & oi.getElement(E_2510_SHIPPER) & " " & oi.getElement(E_2510_TYPE) _
+                            & " " & oi.getElement(E_2510_S2) & " " & oi.getElement(E_2510_DHEO) & " " & oi.getElement(E_2510_DHRQ) & Chr(10)
+                    Next oi
+                End If
+            End If
+            
+        End If
+    Next ci
+    
+    
+    If Trim(rfr.Comment.Text) <> "" Then
+        rfr.Comment.Shape.TextFrame.AutoSize = True
+    Else
+        rfr.Comment.Delete
+    End If
+    
+    
+    
+    
+    
+    getOrdersAndPutSomeComment = tmp
+    
+End Function
+
+Private Function getShipmentsAndPutSomeComment(rfr As Range, d1 As Date, d2 As Date, data As SuitableData2720)
+
+
+    rfr.AddComment ""
+
+    getShipmentsAndPutSomeComment = 0
+    
+    
+    Dim tmp As Double, ciDate As Date, ciOrdersColl As Collection, oi As OrderItem, theStatus As String
+    tmp = 0
+    
+    Dim ci As CoverageItem
+    For Each ci In data.getCollectionOfItems()
+        
+        ciDate = ci.getDate()
+        Set cmnt = Nothing
+    
+        If CDate(d1) <= CDate(ciDate) And CDate(d2) >= CDate(ciDate) Then
+            tmp = tmp + CDbl(ci.getShip())
+            
+            Set ciOrdersColl = ci.getOrdersCollection()
+            
+            If Not ciOrdersColl Is Nothing Then
+                If ciOrdersColl.Count > 0 Then
+                    
+                    For Each oi In ciOrdersColl
+                        
+                        ' now this is shipment so only EF or more
+                        theStatus = oi.getElement(E_2510_S2)
+                        
+                        If theStatus <> "EO" And theStatus <> "CA" And theStatus <> "FO" Then
+                        
+                        
+                            If rfr.Comment.Text = "" Then
+                                rfr.Comment.Text "" & LAYOUT_2510_LABEL
+                            End If
+                        
+                            rfr.Comment.Text "" & rfr.Comment.Text & oi.getElement(E_2510_QTY) & "  " & oi.getElement(E_2510_SELLER) & "  " & oi.getElement(E_2510_SHIPPER) & "  " & oi.getElement(E_2510_TYPE) _
+                                & " " & oi.getElement(E_2510_S2) & "  " & oi.getElement(E_2510_DHEO) & "  " & oi.getElement(E_2510_DHRQ) & Chr(10)
+                        
+                        End If
+                    Next oi
+                    
+                End If
+            End If
+        End If
+    Next ci
+    
+    
+    If Trim(rfr.Comment.Text) <> "" Then
+        rfr.Comment.Shape.TextFrame.AutoSize = True
+    Else
+        rfr.Comment.Delete
+    End If
+    
+    
+    getShipmentsAndPutSomeComment = tmp
+    
+End Function
+
+
+Private Function getRqms(d1 As Date, d2 As Date, data As SuitableData2720) As Double
+
+    ' co prawda 3 argument jest zbedny - ale niech zostanie jawnie - ku pamieci :)
+    
+    Dim tmpRqm As Double, ciDate As Date
+    tmpRqm = 0
+    
+    Dim ci As CoverageItem
+    For Each ci In data.getCollectionOfItems()
+        
+        ciDate = ci.getDate()
+    
+        If CDate(d1) <= CDate(ciDate) And CDate(d2) >= CDate(ciDate) Then
+            tmpRqm = tmpRqm + CDbl(ci.getRqms())
+        End If
+    Next ci
+    
+    getRqms = tmpRqm
+End Function
+
+Private Sub ILayout_setLayout(typeOfLayout As E_TYPE_OF_LAYOUT)
+    layoutType = typeOfLayout
+End Sub
+
+
+Private Function getAreaBasedOn(r As Range) As Range
+    Set getAreaBasedOn = r
+End Function
+
+
+Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
+
     S.Cells(rrow, 1).Value = "PLT"
     S.Cells(rrow, 9).Value = "Past due"
     S.Cells(rrow, 7).Value = "First runout"
+    With S.Range(S.Cells(rrow, 1), S.Cells(rrow, 29))
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+    End With
+    
+    With S.Cells(rrow + 1, 2)
+        .Value = dataFromCorail.plt
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+    End With
+    
+    With S.Cells(rrow + 2, 2)
+        .Value = dataFromCorail.pn
+        .Font.Color = RGB(0, 0, 0)
+        .Font.Bold = True
+    End With
+    
+    
+    S.Cells(rrow + 3, 2).Value = dataFromCorail.approId
+    S.Cells(rrow + 4, 2).Value = dataFromCorail.approName
+    ' S.Cells(rrow + 5, 2).Value = dataFromCorail.xxx
+    
+
     ' tutaj specjalne miesjce pod ruchomy first runout
     ' i chyba powinno to byc opcjonalne :D
     ' ========================================================
-    S.Cells(rrow, 7).Value = "First runout"
     S.Cells(rrow + 1, 7).FormulaR1C1 = "=calcFirstRunOut(R[4]C[3]:R[4]C[22])"
     S.Cells(rrow + 1, 7).Font.Bold = True
     ' ========================================================
     
     
-    ' obsolete
-    ' s.Cells(rrow, 8).Value = Component
+    S.Cells(rrow + 1, 8).Value = "RQM"
+    S.Cells(rrow + 2, 8).Value = "Ordered"
+    S.Cells(rrow + 3, 8).Value = "Shipped"
+    S.Cells(rrow + 4, 8).Value = "Manual"
     
-    '    s.Cells(rrow + 1, 1).Value = inPLT
-    '    s.Cells(rrow + 1, 2).Value = inPRT
-    '    s.Cells(rrow + 4, 2).Value = Comment
-    '    s.Cells(rrow + 4, 2).Interior.Color = kolor
+    With S.Cells(rrow + 5, 8)
+        .Value = "Coverage"
+        .Font.Bold = True
+        .Font.Color = RGB(0, 0, 0)
+        .Interior.Color = RGB(183, 222, 232)
+    End With
     
-    S.Cells(rrow + 1, 8).Value = "req"
-    S.Cells(rrow + 2, 8).Value = "Vessel"
-    S.Cells(rrow + 3, 8).Value = "AIR"
-    S.Cells(rrow + 4, 8).Value = "manual"
-    S.Cells(rrow + 5, 8).Value = "coverage"
-    
-    S.Cells(rrow + 1, 3).Value = "BANK"
-    S.Cells(rrow + 2, 3).Value = "MODE"
-    S.Cells(rrow + 3, 3).Value = "PCS TO GO"
-    S.Cells(rrow + 4, 5).Value = "TTIME"
-    S.Cells(rrow + 5, 3).Value = "MISC"
-    
-    S.Cells(rrow + 1, 5).Value = "CBAL"
-    S.Cells(rrow + 2, 5).Value = "DOH"
-    S.Cells(rrow + 3, 5).Value = "QHD"
-    S.Cells(rrow + 4, 3).Value = "STD PACK"
-    S.Cells(rrow + 5, 5).Value = "BACKLOG"
+    With S.Range(S.Cells(rrow + 1, 8), S.Cells(rrow + 5, 7))
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+    End With
     
     
-
-    Dim cwr As Range
-    ' Najpierw wpisz daty
-    For x = 0 To coverCols - 1
-        
-        ' obsolete implementation
-        ' s.Cells(rrow, x + 10).Value = IsoWeekNumber(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
-        
-        ' using instead built-in iso week num foo directly from worksheet functions
-        S.Cells(rrow, x + 10).Value = Application.WorksheetFunction.IsoWeekNum(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1)
-        
-        Set cwr = S.Cells(rrow, x + 10)
-        cwr.AddComment CStr(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1, "dd-mm-yyyy") + " - " + Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 7, "dd-mm-yyyy"))
-        cwr.Comment.Shape.Width = 150
-        cwr.Comment.Shape.Height = 30
-    Next x
-    ' teraz formu³y
-    S.Cells(rrow + 5, 10).FormulaR1C1 = "=R[-4]C[-4]+R[-3]C[-1]+R[-2]C[-1]-R[-4]C+R[-3]C+R[-2]C+R[-1]C"
+    S.Cells(rrow + 1, 3).Value = "SLOT"
+    S.Cells(rrow + 2, 3).Value = "SLOT"
+    S.Cells(rrow + 3, 3).Value = "SLOT"
+    S.Cells(rrow + 4, 3).Value = "SLOT"
+    S.Cells(rrow + 5, 3).Value = "SLOT"
     
-    If Comment = "ALC" Then
-        S.Cells(rrow + 5, 10).FormulaR1C1 = "=R[-4]C[-4]+R[-3]C[-1]+R[-2]C[-1]-R[-4]C+R[-3]C+R[-2]C+R[-1]C+RC[-6]"
-    End If
+    With S.Range(S.Cells(rrow + 1, 3), S.Cells(rrow + 5, 3))
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+    End With
     
-    For x = 1 To coverCols - 1
-        S.Cells(rrow + 5, 10 + x).FormulaR1C1 = "=RC[-1]-R[-4]C+R[-3]C+R[-2]C+R[-1]C"
-    Next x
-    
+    S.Cells(rrow + 1, 5).Value = "BAL"
+    S.Cells(rrow + 1, 6).FormulaR1C1 = "=R[1]C+R[2]C"
+    S.Cells(rrow + 2, 5).Value = "STOCK"
+    S.Cells(rrow + 2, 6).Value = dataFromCorail.stock
+    S.Cells(rrow + 3, 5).Value = "RECV"
+    S.Cells(rrow + 3, 6).Value = dataFromCorail.recv
 
 End Sub
-
-Private Sub ILayout_setLayout(typeOfLayout As E_TYPE_OF_LAYOUT)
-
-End Sub
-
-
-Private Function getAreaBasedOn(r As Range) As Range
-
-    
-End Function

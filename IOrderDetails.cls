@@ -1,18 +1,12 @@
-Attribute VB_Name = "mainModule"
-''
-' __        __        _    _          ____
-' \ \      / /__  ___| | _| |_   _   / ___|_____   _____ _ __ __ _  __ _  ___
-'  \ \ /\ / / _ \/ _ \ |/ / | | | | | |   / _ \ \ / / _ \ '__/ _` |/ _` |/ _ \
-'   \ V  V /  __/  __/   <| | |_| | | |__| (_) \ V /  __/ | | (_| | (_| |  __/
-'    \_/\_/ \___|\___|_|\_\_|\__, |  \____\___/ \_/ \___|_|  \__,_|\__, |\___|
-'   ___  _ __    / ___|___  _|___/_ _(_) |                         |___/
-'  / _ \| '_ \  | |   / _ \| '__/ _` | | |
-' | (_) | | | | | |__| (_) | | | (_| | | |
-'  \___/|_| |_|  \____\___/|_|  \__,_|_|_|
-'
-'
-'01010111 01100101 01100101 01101011 01101100 01111001  01000011 01101111 01110110 01100101 01110010 01100001 01100111 01100101
-'01101111 01101110  01000011 01101111 01110010 01100001 01101001 01101100
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "IOrderDetails"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
@@ -37,17 +31,15 @@ Attribute VB_Name = "mainModule"
 'SOFTWARE.
 
 
-Public Sub onClick()
-    
-    LoginForm.show
+
+' this is an interface for scaffolding behavior for orders and shipments in final rep
+' helps to merge data from 2510 and 2720 screens from corail
+' connecting by date from DHRQ from ordered/ shipped with coverage d as Date
+
+
+Public Sub findYourOrders(dataFrom2510 As SuitableData2510, covItem As CoverageItem)
 End Sub
 
-Public Sub main(login As String, pass As String)
-    
-    Dim cov As ICoverage
-    
-    Set cov = New WeeklyCoverage
-    cov.runCoverage CStr(login), CStr(pass)
-    
-    MsgBox "ready!"
-End Sub
+Public Function getCollectionOfOrders() As Collection
+End Function
+
