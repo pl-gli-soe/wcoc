@@ -37,6 +37,7 @@ Attribute VB_Exposed = False
 Public plt As String
 Public pn As String
 Public stock As Double
+Public recv As Double
 Public approId As String
 Public approName As String
 Public area As String
