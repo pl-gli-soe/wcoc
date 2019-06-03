@@ -84,6 +84,8 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     ' new rep
     Set repWorksheet = ThisWorkbook.Sheets.Add
     repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
+    repWorksheet.Cells(1, 2).Value = "BIND: "
+    
     Set repCell = repWorksheet.Cells(2, 1)
     
     ' new order rep
@@ -92,6 +94,12 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     Set orderCell = ordersWorksheet.Cells(2, 1)
     fillWithLabels ordersWorksheet, orderCell
     Set orderCell = orderCell.Offset(1, 0)
+    
+    ordersWorksheet.Cells(1, 2).Value = "BIND: "
+    ordersWorksheet.Cells(1, 3).Value = repWorksheet.Name
+    
+    ' repWorksheet.Cells(1, 2).Value = "BIND: "
+    repWorksheet.Cells(1, 3).Value = ordersWorksheet.Name
 
     initialSetupForInputList ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM)
     
@@ -107,12 +115,14 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     Loop Until Trim(inputRef) = ""
     
     
+    theLayout.finalTouchOnRep repWorksheet
+    
 End Sub
 
 
 ' ===========================================================================
 ' ===========================================================================
-' MAIN LOGIC FOR ONE ITERATION
+' MAIN LOGIC FOR ONE ITERATION - ONE PART NUMBER
 Private Sub makeInteration(ByRef inputRef As Range)
 
 
@@ -173,7 +183,10 @@ Private Sub makeInteration(ByRef inputRef As Range)
     If httpReq.usable() Then
         
         theCorail.connectWithHttpReq httpReq
-        httpReq.httpGet "http://" & plt & ".commons.erp.corail.inetpsa.com/rest/sts-i18n/locales/en-US"
+        ' force english usage - basically for the date format ymd h:m
+        ' ale jest NOK aktualnie - nie dziala poprawnie to zapytanie HTTP - widocznie potrzebne sa
+        ' dodatkowe zapytania
+        ' httpReq.httpGet "http://" & plt & ".commons.erp.corail.inetpsa.com/rest/sts-i18n/locales/en-US"
     
         If theCorail.connectWithScreen(2720) Then
         
@@ -185,7 +198,8 @@ Private Sub makeInteration(ByRef inputRef As Range)
             Dim suitableDataFrom2720 As SuitableData2720, ci As CoverageItem
             Set suitableDataFrom2720 = theCorailData.getSuitableData()
             
-            Debug.Print "suitableDataFrom2720.stock: " & suitableDataFrom2720.stock
+            ' OK
+            ' Debug.Print "suitableDataFrom2720.stock: " & suitableDataFrom2720.stock
             
             ' --------------------------------------------------------------
             
@@ -232,29 +246,30 @@ Private Sub makeInteration(ByRef inputRef As Range)
                 Set r = r.Offset(1, 0)
             Next oi
             
-            
+            ' set next empty position for next part number
             Set orderCell = r
+            
+            
+            
+            ' more like moving data from 2510 into 2720 into coverage item object
+            ' ---------------------------------------------------------------------
+            dataMerge suitableDataFrom2720, suitableDataCalcFrom2510
+            ' ---------------------------------------------------------------------
+            
+            makeLineInCoverageRep suitableDataFrom2720, repCell
             
             ' --------------------------------------------------------------
             
-            ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
-            'fso.makeHtmlFile "t2510_" & plt & "_" & pn, theCorailData.getString()
-            'Dim DH As DOMHandler
-            'i = 1
-            'For Each txt In theCorailData.getCollectionOfData()
-            '    fso.makeHtmlFile "t2510_" & "_" & i & "_" & plt & "_" & pn, CStr(txt)
-            '    i = i + 1
-            'Next txt
-            ' Debug.Print theCorailData.getCollectionOfData().Count
             
             
             ' but this is really raw data without any setup at all
-            i = 1
-            For Each item In theCorailData.getCollectionOfData()
-                ' Debug.Print TypeName(item)  ' String OK
-                fso.makeHtmlFile "t2510_" & "_" & i & "_" & plt & "_" & pn, CStr(item)
-                i = i + 1
-            Next item
+            'i = 1
+            'For Each item In theCorailData.getCollectionOfData()
+            '    ' Debug.Print TypeName(item)  ' String OK
+            '    fso.makeHtmlFile "t2510_" & "_" & i & "_" & plt & "_" & pn, CStr(item)
+            '    i = i + 1
+            'Next item
+            
         End If
     Else
         MsgBox "Fatal error during http connection!", vbExclamation
@@ -264,6 +279,30 @@ Private Sub makeInteration(ByRef inputRef As Range)
 End Sub
 ' ===========================================================================
 ' ===========================================================================
+
+
+Private Sub makeLineInCoverageRep(main2720data As SuitableData2720, r As Range)
+
+
+
+    
+    ' args:
+    ' r - starting point for this "line" of data
+    ' main2720data - is exactly much more because already has also all important data collected from screen 2510
+    
+    Set theLayout = New WeeklyLayout
+    
+    With theLayout
+        .setLayout E_TYPE_OF_LAYOUT_WEEKLY_DEFAULT
+        .nowMergeWithDataFromCorail r, main2720data
+        ' "colors" stands as symbol for how data and layout processing
+        .putSomeColorsForThisPartNumber r
+    End With
+    
+    Set r = r.Offset(7, 0)
+    
+End Sub
+
 
 
 Private Sub initialSetupForInputList(ish As Worksheet)
@@ -308,4 +347,25 @@ Private Sub fillWithLabels(osh As Worksheet, refRange As Range)
     r.Offset(0, WCOC.E_ORDER_LIST_REP_TYPE) = "TYPE"
     r.Offset(0, WCOC.E_ORDER_LIST_REP_UM) = "UM"
     r.Offset(0, WCOC.E_ORDER_LIST_REP_STATUS) = "STATUS"
+End Sub
+
+
+
+
+Private Sub dataMerge(data2720 As SuitableData2720, data2510 As SuitableData2510)
+
+    Dim orderItemDetails As IOrderDetails, covItem As CoverageItem
+    
+    ' OK!
+    'Debug.Print "count collection for data merger (2720): " & data2720.getCollectionOfItems().Count
+    'Debug.Print "count collection for data merger (2510): " & data2510.getOrders().Count
+    
+    
+    
+    
+    For Each covItem In data2720.getCollectionOfItems()
+        Set orderItemDetails = New OrderDetails
+        ' inside this sub we asign orders into covItem already
+        orderItemDetails.findYourOrders data2510, covItem
+    Next covItem
 End Sub

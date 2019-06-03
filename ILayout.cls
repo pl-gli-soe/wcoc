@@ -38,3 +38,10 @@ End Sub
 
 Public Sub putSomeColorsForThisPartNumber(r As Range)
 End Sub
+
+Public Sub nowMergeWithDataFromCorail(r As Range, main2720data As SuitableData2720)
+End Sub
+
+
+Public Sub finalTouchOnRep(rep As Worksheet)
+End Sub

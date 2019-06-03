@@ -38,8 +38,8 @@ Attribute VB_Name = "GlobalFooModule"
 
 
 
-Function ostatniaNiedziela(Data)
-    ostatniaNiedziela = Data - Weekday(Data) + 1
+Function ostatniaNiedziela(data)
+    ostatniaNiedziela = data - Weekday(data) + 1
 End Function
 
 

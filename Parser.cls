@@ -170,6 +170,10 @@ Private Sub innerParse2510()
         For Each stronaOrderow In coll
         
         
+            francuski = False
+            angielski = False
+        
+        
             ' every page will be treat as seperate web-page
             d.getDom.idoc.body.innerHTML = stronaOrderow
             d.getDom.doc.body.innerHTML = stronaOrderow
@@ -227,7 +231,18 @@ Private Sub innerParse2510()
                         ' ---------------------------------
                         
                         If Left(c.innerHTML, 3) = "SGR" Then tmpColIndxArr(WCOC.E_2510_SGR_LINE) = i
-                        If c.innerHTML = "Product" Or c.innerHTML = "Produit" Then tmpColIndxArr(WCOC.E_2510_PRODUCT) = i
+                        If c.innerHTML = "Product" Or c.innerHTML = "Produit" Then
+                            tmpColIndxArr(WCOC.E_2510_PRODUCT) = i
+                            
+                            If c.innerHTML = "Product" Then
+                                francuski = False
+                                angielski = True
+                            ElseIf c.innerHTML = "Produit" Then
+                                francuski = True
+                                angielski = False
+                            End If
+                            
+                        End If
                         If Left(c.innerHTML, 2) = "Qt" Then tmpColIndxArr(WCOC.E_2510_QTY) = i
                         If c.innerHTML = "Order number" Or c.innerHTML Like "*Ordre" Then tmpColIndxArr(WCOC.E_2510_ORDER_NUMBER) = i
                         If c.innerHTML = "DN" Then tmpColIndxArr(WCOC.E_2510_DN) = i
@@ -238,7 +253,18 @@ Private Sub innerParse2510()
                         If c.innerHTML = "DHRQ" Then tmpColIndxArr(WCOC.E_2510_DHRQ) = i
                         If c.innerHTML = "DHAS" Then tmpColIndxArr(WCOC.E_2510_DHAS) = i
                         
-                        If c.innerHTML = "Routing" Or c.innerHTML = "Routage" Then tmpColIndxArr(WCOC.E_2510_ROUTING) = i
+                        If UCase(c.innerHTML) = UCase("Routing") Or UCase(c.innerHTML) = UCase("Routage") Then
+                            tmpColIndxArr(WCOC.E_2510_ROUTING) = i
+                            
+                            If UCase(c.innerHTML) = UCase("Routing") Then
+                                francuski = False
+                                angielski = True
+                            ElseIf UCase(c.innerHTML) = UCase("Routage") Then
+                                francuski = True
+                                angielski = False
+                            End If
+                            
+                        End If
                         If Trim(c.innerHTML) = "Seller" Or c.innerHTML = "Vendeur" Then tmpColIndxArr(WCOC.E_2510_SELLER) = i
                         If Trim(c.innerHTML) = "Shipper" Or (Left(c.innerHTML, 3) = "Exp" And Right(c.innerHTML, 4) = "teur") Then tmpColIndxArr(WCOC.E_2510_SHIPPER) = i
                         If Trim(c.innerHTML) = "S" Then tmpColIndxArr(WCOC.E_2510_S2) = i
@@ -300,20 +326,20 @@ Private Sub innerParse2510()
                             Set tmpDH_Handler = New DH_Handler
                             
                             If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHEO)) Then
-                                tmpDH_Handler.DHEO = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEO))
+                                tmpDH_Handler.DHEO = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEO), CBool(francuski))
                             End If
                             
                             If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHEF)) Then
-                                tmpDH_Handler.DHEF = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEF))
+                                tmpDH_Handler.DHEF = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEF), CBool(francuski))
                             End If
                             
                             
                             If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHAS)) Then
-                                tmpDH_Handler.DHAS = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHAS))
+                                tmpDH_Handler.DHAS = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHAS), CBool(francuski))
                             End If
                             
                             If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHRQ)) Then
-                                tmpDH_Handler.DHRQ = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHRQ))
+                                tmpDH_Handler.DHRQ = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHRQ), CBool(francuski))
                             End If
                             
                             
@@ -428,6 +454,12 @@ Private Sub innerParse2720()
         sd.stock = CDbl(forceStringToBeDouble(CStr(inputElement.Value)))
         ' ---------------------------------------------------------------------
         
+        
+        ' suitable data
+        ' ---------------------------------------------------------------------
+        Set inputElement = d.getDom.idoc.getElementById("receivedOnSite")
+        sd.recv = CDbl(forceStringToBeDouble(CStr(inputElement.Value)))
+        ' ---------------------------------------------------------------------
         
         
         
@@ -702,29 +734,59 @@ Private Function parseStringToDate(strD) As Date
     
 End Function
 
-Private Function parseStringToDateTime(strDT) As Date
+Private Function parseStringToDateTime(strDT, isFrance As Boolean) As Date
     
+    
+    ' angielski
     ' format 19/05/29 10:20
     ' format yy/mm/dd hh:mm
+    '
+    '
+    ' francuski
+    ' format dd/mm/yy hh:mm
     
-    Dim d As Integer
-    Dim m As Integer
-    Dim y As Integer
+    
+    Dim d1 As Integer
+    Dim m1 As Integer
+    Dim y1 As Integer
+    
+    Dim d2 As Integer
+    Dim m2 As Integer
+    Dim y2 As Integer
     
     Dim hh As Integer
     Dim mm As Integer
     
+    Dim dzis As Date
+    dzis = Date
+    
+    
+
+    
+    
 
     If IsNumeric(Left(strDT, 2)) Then
-        y = Int(Left(strDT, 2))
+        d1 = Int(Left(strDT, 2))
     End If
     
     If IsNumeric(Mid(strDT, 4, 2)) Then
-        m = Int(Mid(strDT, 4, 2))
+        m1 = Int(Mid(strDT, 4, 2))
     End If
     
     If IsNumeric(Mid(strDT, 7, 2)) Then
-        d = Int(Mid(strDT, 7, 2))
+        y1 = Int(Mid(strDT, 7, 2))
+    End If
+    
+    If IsNumeric(Left(strDT, 2)) Then
+        y2 = Int(Left(strDT, 2))
+    End If
+    
+    If IsNumeric(Mid(strDT, 4, 2)) Then
+        m2 = Int(Mid(strDT, 4, 2))
+    End If
+    
+    If IsNumeric(Mid(strDT, 7, 2)) Then
+        d2 = Int(Mid(strDT, 7, 2))
     End If
     
     If IsNumeric(Mid(strDT, 10, 2)) Then
@@ -734,12 +796,29 @@ Private Function parseStringToDateTime(strDT) As Date
     If IsNumeric(Mid(strDT, 13, 2)) Then
         mm = Int(Mid(strDT, 13, 2))
     End If
+        
     
+
+    ' prototypowa logika sprawdzajaca, czy wygenerowana data jest w miare blisko daty dzisiejszej
+    '
     
-    Dim S As String
-    S = Format(y & "-" & m & "-" & d & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
+    Dim S1 As String, S2 As String
+    Dim SD1 As Date, SD2 As Date
     
-    parseStringToDateTime = CDate(CStr(S))
+    S1 = Format(y1 & "-" & m1 & "-" & d1 & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
+    S2 = Format(y2 & "-" & m2 & "-" & d2 & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
+    
+    SD1 = CDate(S1)
+    SD2 = CDate(S2)
+    
+    diff1 = Math.Abs(dzis - SD1)
+    diff2 = Math.Abs(dzis - SD2)
+    
+    If diff1 < diff2 Then
+        parseStringToDateTime = CDate(CStr(SD1))
+    Else
+        parseStringToDateTime = CDate(CStr(SD2))
+    End If
     
 End Function
 
