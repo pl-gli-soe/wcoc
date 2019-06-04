@@ -46,7 +46,7 @@ Private commonDataIsReady As Boolean
 
 ' for suitable data (Item: Me - is component for SuitableData2510)
 
-Private SgrLine As String
+Private sgrLine As String
 Private pn As String
 Private qty As Double
 Private orderNum As String
@@ -101,7 +101,7 @@ Public Sub coforConstructor(mSellerCofor As String, mShipperCofor As String)
 
 Public Sub commonConstructor(arr() As String, doubledQty As Double)
 
-    SgrLine = CStr(arr(WCOC.E_2510_SGR_LINE))
+    sgrLine = CStr(arr(WCOC.E_2510_SGR_LINE))
     pn = CStr(arr(WCOC.E_2510_PRODUCT))
     qty = CDbl(doubledQty)
     orderNum = CStr(arr(WCOC.E_2510_ORDER_NUMBER))
@@ -170,7 +170,7 @@ Public Function getElement(whichElement As E_2510_ELEMENT) As Variant
             getElement = CStr(sellerCofor)
             
         Case E_2510_ELEMENT.E_2510_SGR_LINE
-            getElement = CStr(SgrLine)
+            getElement = CStr(sgrLine)
             
         Case E_2510_ELEMENT.E_2510_SHIPPER
             getElement = CStr(shipperCofor)

@@ -37,7 +37,7 @@ Implements ICorailData
 Private rawString As String
 Private theDomHandler As DOMHandler
 Private theParser As IParser
-Private sd As SuitableData2720
+Private sd As Variant
 
 Private Sub Class_Initialize()
     rawString = ""
@@ -97,7 +97,7 @@ Private Sub ICorailData_parseString()
     
 
     theParser.importPackageOfData Me
-    ' sd As SuitableData2720 and foo as Variant but VBA allows
+    ' sd As SuitableData2720 or SuitableXtraData2720 and foo as Variant but VBA allows
     Set sd = theParser.getConvertedDataSuitableForExcel()
     
     ' i tutaj pieknie dziala pomimo tego ze funkcja zwraca Variant to ladnie dopasowuje sie do
