@@ -192,7 +192,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
         
             ' 2720
             ' --------------------------------------------------------------
-            Set theCorailData = theCorail.getDataFromScreen(2720, plt, pn)
+            Set theCorailData = theCorail.getDataFromScreen(plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2720_COMMON)
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
             
             Dim suitableDataFrom2720 As SuitableData2720, ci As CoverageItem
@@ -201,6 +201,14 @@ Private Sub makeInteration(ByRef inputRef As Range)
             ' OK
             ' Debug.Print "suitableDataFrom2720.stock: " & suitableDataFrom2720.stock
             
+            
+            ' 2720 xtra rqms
+            ' --------------------------------------------------------------
+            Set theCorailData = theCorail.getDataFromScreen(plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2720_XTRA_RQMS)
+            Dim suitableXtraDataFrom2720 As SuitableXtraData2720
+            Set suitableXtraDataFrom2720 = theCorailData.getSuitableData()
+            
+            
             ' --------------------------------------------------------------
             
             ' tylko na potrzeby testu wrzucamy odpowiedz http do lokalnego pliku
@@ -208,7 +216,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             
             ' 2510
             ' --------------------------------------------------------------
-            Set theCorailData = theCorail.getDataFromScreen(2510, plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC)
+            Set theCorailData = theCorail.getDataFromScreen(plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC)
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
             
             Dim suitableDataCalcFrom2510 As SuitableData2510, oi As OrderItem
@@ -220,7 +228,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             
             Set r = orderCell
             
-            Debug.Print "suit.getOrders() count: " & suitableDataCalcFrom2510.getOrders().Count
+            ' Debug.Print "suit.getOrders() count: " & suitableDataCalcFrom2510.getOrders().Count
             
             
             
@@ -253,7 +261,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             
             ' more like moving data from 2510 into 2720 into coverage item object
             ' ---------------------------------------------------------------------
-            dataMerge suitableDataFrom2720, suitableDataCalcFrom2510
+            dataMerge suitableDataFrom2720, suitableXtraDataFrom2720, suitableDataCalcFrom2510
             ' ---------------------------------------------------------------------
             
             makeLineInCoverageRep suitableDataFrom2720, repCell
@@ -352,13 +360,47 @@ End Sub
 
 
 
-Private Sub dataMerge(data2720 As SuitableData2720, data2510 As SuitableData2510)
+Private Sub dataMerge(data2720 As SuitableData2720, xtraData2720 As SuitableXtraData2720, data2510 As SuitableData2510)
 
-    Dim orderItemDetails As IOrderDetails, covItem As CoverageItem
+    Dim orderItemDetails As IOrderDetails, covItem As CoverageItem, xtraRqms As XtraRqmItem
     
     ' OK!
     'Debug.Print "count collection for data merger (2720): " & data2720.getCollectionOfItems().Count
     'Debug.Print "count collection for data merger (2510): " & data2510.getOrders().Count
+    
+    ' Debug.Print xtraData2720.xtraRqms.Count ' OK
+    
+    
+    ' add xtra rqms
+    For Each xtraRqms In xtraData2720.xtraRqms
+    
+    
+        
+        
+            Set covItem = findCovItem(xtraRqms.d, data2720.getCollectionOfItems())
+            
+            If covItem Is Nothing Then
+                ' need a new covItem
+                ' --------------------------------------------------------------------------
+                If Len(Trim(xtraRqms.sgrLine)) = 2 Then
+                
+                    Set covItem = New CoverageItem
+                    covItem.constructor xtraRqms.d, xtraRqms.Total, 0, 0, 0
+                    covItem.setXtraRqms xtraRqms
+                    data2720.addCovLine covItem
+                End If
+                ' --------------------------------------------------------------------------
+            Else
+                ' there is sth - check if data is the same
+                ' --------------------------------------------------------------------------
+                If Len(Trim(xtraRqms.sgrLine)) = 2 Then
+                    covItem.setXtraRqms xtraRqms
+                End If
+                ' --------------------------------------------------------------------------
+            End If
+        
+        
+    Next xtraRqms
     
     
     
@@ -369,3 +411,17 @@ Private Sub dataMerge(data2720 As SuitableData2720, data2510 As SuitableData2510
         orderItemDetails.findYourOrders data2510, covItem
     Next covItem
 End Sub
+
+
+Private Function findCovItem(d As Date, c As Collection) As CoverageItem
+
+    Set findCovItem = Nothing
+    
+    Dim ci As CoverageItem
+    For Each ci In c
+        If CDate(ci.getDate()) = CDate(d) Then
+            Set findCovItem = ci
+            Exit Function
+        End If
+    Next ci
+End Function

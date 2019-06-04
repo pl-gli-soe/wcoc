@@ -46,6 +46,7 @@ Attribute VB_Exposed = False
 Private d As Date
 Private pcDemand As Double
 Private incBc As Double
+Private xRqm As XtraRqmItem
 
 ' calc
 Private ordered As Double
@@ -57,6 +58,17 @@ Private shipped As Double
 Private ready As Boolean
 
 
+Public Function getXtraRqmsStr() As String
+
+    getXtraRqmsStr = ""
+    
+    If Not xRqm Is Nothing Then
+    
+        getXtraRqmsStr = xRqm.d & " " & xRqm.sgrLine & " " & xRqm.Total & Chr(10)
+    End If
+End Function
+
+
 
 Public Function getOrdersCollection() As Collection
     
@@ -66,6 +78,10 @@ End Function
 
 Public Sub setOrderDetails(arg As IOrderDetails)
     Set orderItemDetails = arg
+End Sub
+
+Public Sub setXtraRqms(arg As XtraRqmItem)
+    Set xRqm = arg
 End Sub
 
 Public Sub makeReady()
@@ -130,5 +146,10 @@ Private Sub Class_Initialize()
     ready = False
     
     Set orderItemDetails = Nothing
+    Set xRqm = Nothing
 End Sub
 
+Private Sub Class_Terminate()
+    Set orderItemDetails = Nothing
+    Set xRqm = Nothing
+End Sub

@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "ICorail"
+Attribute VB_Name = "XtraRqmItem"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -30,15 +30,8 @@ Attribute VB_Exposed = False
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
 
-
-
-Public Function connectWithHttpReq(httpReq As HTTPRequestHandler) As Boolean
-End Function
-
-Public Function connectWithScreen(numberOfScreen) As Boolean
-End Function
-
-Public Function getDataFromScreen(pltCode, partNumber, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
-End Function
-
-
+Public d As Date
+Public sgrLine As String
+Public clv As Double
+Public fabPlan As Double
+Public Total As Double
