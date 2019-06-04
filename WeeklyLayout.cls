@@ -115,7 +115,7 @@ Private Sub ILayout_putSomeColorsForThisPartNumber(r As Range)
             d1 = CDate(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 1, "yyyy-mm-dd"))
             d2 = CDate(Format(Round(GlobalFooModule.ostatniaNiedziela(Date)) + x * 7 + 7, "yyyy-mm-dd"))
             
-            refRqm = getRqms(d1, d2, dataFromCorail)
+            refRqm = getRqms(refRqm, d1, d2, dataFromCorail)
             refOrder = getOrdersAndPutSomeComment(refOrder, d1, d2, dataFromCorail)
             refShipment = getShipmentsAndPutSomeComment(refShipment, d1, d2, dataFromCorail)
             
@@ -272,9 +272,9 @@ Private Function getShipmentsAndPutSomeComment(rfr As Range, d1 As Date, d2 As D
 End Function
 
 
-Private Function getRqms(d1 As Date, d2 As Date, data As SuitableData2720) As Double
+Private Function getRqms(rfr As Range, d1 As Date, d2 As Date, data As SuitableData2720) As Double
 
-    ' co prawda 3 argument jest zbedny - ale niech zostanie jawnie - ku pamieci :)
+    rfr.AddComment ""
     
     Dim tmpRqm As Double, ciDate As Date
     tmpRqm = 0
@@ -286,8 +286,17 @@ Private Function getRqms(d1 As Date, d2 As Date, data As SuitableData2720) As Do
     
         If CDate(d1) <= CDate(ciDate) And CDate(d2) >= CDate(ciDate) Then
             tmpRqm = tmpRqm + CDbl(ci.getRqms())
+            
+            rfr.Comment.Text "" & rfr.Comment.Text & ci.getXtraRqmsStr()
         End If
     Next ci
+    
+    
+    If Trim(rfr.Comment.Text) <> "" Then
+        rfr.Comment.Shape.TextFrame.AutoSize = True
+    Else
+        rfr.Comment.Delete
+    End If
     
     getRqms = tmpRqm
 End Function

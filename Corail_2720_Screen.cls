@@ -54,6 +54,7 @@ Private num As Integer
 
 Private preUrl As String
 Private screenUrl As String
+Private moreRqmsUrl As String
 Private url As String
 
 Private req As HTTPRequestHandler
@@ -70,6 +71,11 @@ Private Sub Class_Initialize()
     screenUrl = "/getProductSummaryRead.do?beanId="
     preUrl = ".control.erp.corail.inetpsa.com"
     url = ""
+    
+    ' more rqms
+    ' http://sx.control.erp.corail.inetpsa.com/getFbpcForProductSummaryList.do?productCode=YP000501KU
+    moreRqmsUrl = "/getFbpcForProductSummaryList.do?productCode="
+    
     Set req = Nothing
     
     Set valid = New Validator
@@ -88,24 +94,50 @@ End Sub
 
 Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 
-    ' -----------------------------------------------------------------------------
-    url = "http://" & CStr(plt) & preUrl & screenUrl & CStr(partNumber)
-    
+
+
     Dim answer As String
-    answer = req.httpGet(url)
+
+    Set ICorailScreen_getData = Nothing
+
+    If e = E_TYPE_OF_DATA_FROM_CORAIL_2720_COMMON Then
+
+        ' -----------------------------------------------------------------------------
+        url = "http://" & CStr(plt) & preUrl & screenUrl & CStr(partNumber)
+        answer = req.httpGet(url)
+        
+        If valid.checkAnswer(num, answer) Then
+            Set theCorailData = New CorailDataFrom2720
+            theCorailData.setString answer
+            theCorailData.parseString
+        Else
+            Set theCorailData = Nothing
+        End If
+        
+        
+        Set ICorailScreen_getData = theCorailData
+        
+        ' -----------------------------------------------------------------------------
+        
+    ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2720_XTRA_RQMS Then
     
-    If valid.checkAnswer(num, answer) Then
-        Set theCorailData = New CorailDataFrom2720
-        theCorailData.setString answer
-        theCorailData.parseString
-    Else
-        Set theCorailData = Nothing
+        ' -----------------------------------------------------------------------------
+        url = "http://" & CStr(plt) & preUrl & moreRqmsUrl & CStr(partNumber)
+        answer = req.httpGet(url)
+        
+        If valid.checkAnswer(num, answer) Then
+            Set theCorailData = New CorailDataFrom2720
+            theCorailData.setString answer
+            theCorailData.parseString
+        Else
+            Set theCorailData = Nothing
+        End If
+        
+        
+        Set ICorailScreen_getData = theCorailData
+        
+        ' -----------------------------------------------------------------------------
     End If
-    
-    
-    Set ICorailScreen_getData = theCorailData
-    
-    ' -----------------------------------------------------------------------------
     
 End Function
 

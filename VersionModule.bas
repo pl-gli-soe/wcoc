@@ -38,7 +38,19 @@ Attribute VB_Name = "VersionModule"
 'SOFTWARE.
 
 
-' version 0.08
+
+' version 0.10
+' update: 2019-06-03 15:00
+' ========================================================================================
+'Request URL: http://ei.control.erp.corail.inetpsa.com/getFbpcForProductSummaryList.do?productCode=9819671280
+'request Method: Post
+'Status Code: 200
+'Remote Address: 10.208.3.205:80
+'referrer Policy: no -referrer - when - downgrade
+' ========================================================================================
+
+
+' version 0.09
 ' update: 2019-06-03 13:45
 ' ========================================================================================
 
