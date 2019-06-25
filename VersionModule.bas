@@ -67,6 +67,41 @@ Attribute VB_Name = "VersionModule"
 ' ========================================================================================
 
 
+' version 0.12 -> 2019-06-25 -> DODATKOWY BACKEND
+''''''''''''''''''
+' ========================================================================================
+' wydzielenie tworzenia listy orderow do osobnego prywatnego suba doPortionOfOrdersIf
+' klasa WeeklyCoverage line:  235 -> definicja line: 271
+' co z tym idzie nowy checkbox w oknie logowania domyslnie false - nie bedzie trzeba juz chowac nic ->
+' decyzja z checkbox przechodzi jako zdefiniowany trzeci parametr main -> oraz na stale w interfejsie/klasie ICoverage
+' jako wymog implementacyjny przyszlych subklas typu ICoverage
+'
+' klasa WeeklyCoverage line: 205 - poniewaz nie ma sensu na sile szukania plt code na serwerze
+' zwyczajnie pobralem nazwe plantu z listy input, poniewaz i tak decyzja otwierania wybranego serwera
+' opiera sie na wpisie w kolumne PLT w input
+' jednak zachowujac std suitable data dla klasy: SuitableData2720 property plt: line 28 -> Public plt As String
+'
+' parsing pod cofory:
+' z tabeli id: tableauFluxDePiece
+' kolejno:
+' <input type="hidden" name="psp.vendor.cofor" id="psp.vendor.cofor" value="A004HP  01">
+' <input type="hidden" name="psp.shipper.cofor" id="psp.shipper.cofor" value="A004HP  01">
+' <input type="hidden" name="psp.manufacturer.cofor" id="psp.manufacturer.cofor" value="A004HP  01">
+' sa dostepne bezposrednie ID w HTML wiec szybko, latwo i przyjemnie
+' pozostawiam do wyboru, ktory chcemy miec dostepny w wygenerowanym coverage
+'
+' klasa suitable data 2720 new properties (cofors): line 44
+' and also klasa Parser new line: 550 -> parsing data from 2720 directly by ID into SuitableData (COFORS)
+' jednak supplier name jest nieco bardziej wymagajacy z powodu braku referencji - trzeba szukac posrednio
+' poprzez petle elementow td
+' WeeklyLayout -> line 266 -> wrzucilem nazwe tymczasowo tutaj -> mozna zmieniac.
+'
+'
+' ========================================================================================
+
+
+
+
 ' version 0.11c Paulina ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' update: 2019-06-24
 ' ========================================================================================

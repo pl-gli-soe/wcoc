@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} LoginForm 
    Caption         =   "PSA Login"
-   ClientHeight    =   1470
+   ClientHeight    =   1980
    ClientLeft      =   45
    ClientTop       =   375
    ClientWidth     =   5025
@@ -15,5 +15,5 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Private Sub SubmitBtn_Click()
     Hide
-    main CStr(Me.TextBoxLogin), CStr(Me.TextBoxPass)
+    main CStr(Me.TextBoxLogin), CStr(Me.TextBoxPass), CBool(Me.CheckBoxOrderList)
 End Sub

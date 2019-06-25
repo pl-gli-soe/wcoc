@@ -32,5 +32,5 @@ Attribute VB_Exposed = False
 
 
 
-Public Sub runCoverage(login, pass)
+Public Sub runCoverage(login, pass, Optional boolOrderList As Boolean)
 End Sub

@@ -42,12 +42,12 @@ Public Sub onClick()
     LoginForm.show
 End Sub
 
-Public Sub main(login As String, pass As String)
+Public Sub main(login As String, pass As String, xtraOrderList As Boolean)
     
     Dim cov As ICoverage
     
     Set cov = New WeeklyCoverage
-    cov.runCoverage CStr(login), CStr(pass)
+    cov.runCoverage CStr(login), CStr(pass), CBool(xtraOrderList)
     
     
     MsgBox "ready!", vbInformation

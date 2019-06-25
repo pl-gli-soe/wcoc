@@ -93,7 +93,10 @@ Private Sub repFinalTouch(rep As Worksheet)
 End Sub
 
 Private Sub ordersFinalTouch(o As Worksheet)
-    o.Visible = xlSheetHidden
+
+    ' od kiedy tworzenie listy jest opcjonalne nie ma potrzeby juz jej chowac
+    ' jednak samego suba sobie zostawie dla potencjalnych przyszlych formowatowan
+    ' o.Visible = xlSheetHidden
 End Sub
 
 Private Sub ILayout_nowMergeWithDataFromCorail(r As Range, main2720data As SuitableData2720)
@@ -340,8 +343,7 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     S.Cells(rrow, 9).Value = "Past due"
     S.Cells(rrow, 7).Value = "First runout"
     '========================================================
-    ' Paulina Ln 336
-    '?????????   S.Cells(rrow + 1, 1).Value = dataFromCorail.plt ' not working
+
     With S.Range(S.Cells(rrow + 1, 1), S.Cells(rrow + 5, 1))
         .Interior.Color = RGB(140, 140, 140)
         .Font.Color = RGB(255, 255, 255)
@@ -349,7 +351,7 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
         .Merge
         .Orientation = 90
         .HorizontalAlignment = xlCenter
-        .Value = dataFromCorail.plt 'not working
+        .Value = dataFromCorail.plt 'working
         
     End With
     ' color req
@@ -369,7 +371,8 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     
     
     With S.Cells(rrow + 1, 2)
-        .Value = dataFromCorail.plt
+        ' .Value = dataFromCorail.plt ' zatem tutaj wolny slot teraz
+        .Value = dataFromCorail.supplierName ' wrzucilem tymczasowo - mozna zmienic! :)
         .Interior.Color = RGB(140, 140, 140)
         .Font.Color = RGB(255, 255, 255)
         .Font.Bold = True
@@ -385,8 +388,9 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     
     S.Cells(rrow + 3, 2).Value = dataFromCorail.approId
     S.Cells(rrow + 4, 2).Value = dataFromCorail.approName
-    '''''''''''''''''''''''''''''TU BRAK ZACIAGANIA SHIPPER COFOR '''''''''''''''''''''''
-    ' S.Cells(rrow + 5, 2).Value = dataFromCorail.xxx
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''
+    ' przykladowo wybralem vendor cofor - mozna teraz wybrac rowniez shipper oraz manufacturer
+    S.Cells(rrow + 5, 2).Value = dataFromCorail.vendorCofor
     
 
     ' tutaj specjalne miesjce pod ruchomy first runout
