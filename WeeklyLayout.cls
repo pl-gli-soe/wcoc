@@ -64,13 +64,36 @@ End Sub
 
 Private Sub ILayout_finalTouchOnRep(rep As Worksheet)
     
+
+    If rep.Cells(1, 1).Value Like "Weekly Coverage on Corail*" Then
+        repFinalTouch rep
+    Else
+        ordersFinalTouch rep
+    End If
+End Sub
+
+
+Private Sub repFinalTouch(rep As Worksheet)
     rep.Columns("A:A").ColumnWidth = 4
-    rep.Columns("B:B").ColumnWidth = 17
+    ' rep.Columns("B:B").ColumnWidth = 17
     rep.Columns("C:C").ColumnWidth = 8
     rep.Columns("D:D").ColumnWidth = 1
     rep.Columns("J:AC").ColumnWidth = 6
+    ''''''''''''''''''''''''''''''''''''
     
+    
+    ' Paulina
+    ''''''''''''''''''''''''''''''''''''
+    rep.Columns("B:B").EntireColumn.AutoFit
     rep.Activate
+    '''''''''''''''''''''''''''''''''''''
+    ActiveWindow.DisplayGridlines = False
+    '''''''''''''''''''''''''''''''''''''
+    '''''''''''''''''''''''''''''''''''''
+End Sub
+
+Private Sub ordersFinalTouch(o As Worksheet)
+    o.Visible = xlSheetHidden
 End Sub
 
 Private Sub ILayout_nowMergeWithDataFromCorail(r As Range, main2720data As SuitableData2720)
@@ -316,11 +339,34 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     S.Cells(rrow, 1).Value = "PLT"
     S.Cells(rrow, 9).Value = "Past due"
     S.Cells(rrow, 7).Value = "First runout"
+    '========================================================
+    ' Paulina Ln 336
+    '?????????   S.Cells(rrow + 1, 1).Value = dataFromCorail.plt ' not working
+    With S.Range(S.Cells(rrow + 1, 1), S.Cells(rrow + 5, 1))
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+        .Merge
+        .Orientation = 90
+        .HorizontalAlignment = xlCenter
+        .Value = dataFromCorail.plt 'not working
+        
+    End With
+    ' color req
+    With S.Range(S.Cells(rrow + 1, 10), S.Cells(rrow + 1, 29))
+        .Interior.Color = RGB(242, 242, 242)
+        .Font.Color = RGB(0, 0, 0)
+        .Font.Bold = True
+    End With
+   
+    '========================================================
+    
     With S.Range(S.Cells(rrow, 1), S.Cells(rrow, 29))
         .Interior.Color = RGB(140, 140, 140)
         .Font.Color = RGB(255, 255, 255)
         .Font.Bold = True
     End With
+    
     
     With S.Cells(rrow + 1, 2)
         .Value = dataFromCorail.plt
@@ -336,8 +382,10 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     End With
     
     
+    
     S.Cells(rrow + 3, 2).Value = dataFromCorail.approId
     S.Cells(rrow + 4, 2).Value = dataFromCorail.approName
+    '''''''''''''''''''''''''''''TU BRAK ZACIAGANIA SHIPPER COFOR '''''''''''''''''''''''
     ' S.Cells(rrow + 5, 2).Value = dataFromCorail.xxx
     
 
@@ -368,11 +416,11 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     End With
     
     
-    S.Cells(rrow + 1, 3).Value = "SLOT"
-    S.Cells(rrow + 2, 3).Value = "SLOT"
-    S.Cells(rrow + 3, 3).Value = "SLOT"
-    S.Cells(rrow + 4, 3).Value = "SLOT"
-    S.Cells(rrow + 5, 3).Value = "SLOT"
+    S.Cells(rrow + 1, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 2, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 3, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 4, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 5, 3).Value = "  " '"SLOT"
     
     With S.Range(S.Cells(rrow + 1, 3), S.Cells(rrow + 5, 3))
         .Interior.Color = RGB(140, 140, 140)

@@ -80,6 +80,11 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     ' -------------------------------------
     httpReq.setup login, pass
     ' -------------------------------------
+    
+    
+
+    
+    
 
     ' new rep
     Set repWorksheet = ThisWorkbook.Sheets.Add
@@ -115,8 +120,14 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     Loop Until Trim(inputRef) = ""
     
     
-    theLayout.finalTouchOnRep repWorksheet
+    With theLayout
+        .finalTouchOnRep repWorksheet
+        .finalTouchOnRep ordersWorksheet
+    End With
     
+    
+
+     
 End Sub
 
 

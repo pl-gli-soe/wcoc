@@ -538,7 +538,9 @@ Private Sub innerParse2720()
             ' Debug.Print sd.pn OK!
             ' ---------------------------------------------------------------------
             
+                        
             
+                      
             ' suitable data for PLT
             ' ---------------------------------------------------------------------
             Set inputElement = d.getDom.idoc.getElementById("stockDepart")
