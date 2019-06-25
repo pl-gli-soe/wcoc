@@ -39,6 +39,72 @@ Attribute VB_Name = "VersionModule"
 
 
 
+' ========================================================================================
+
+' ==================================== TO DO =============================================
+
+' ========================================================================================
+' TT marking
+' supplier name / COFOR to be added
+' plt name to be added
+' Adding schedules (3560 as per DHRQ) - as per most recent calc. date
+' in comment  DHRQ / DHEO limit to date only
+' "SLOTs" - TBD
+' coverage requirements line to be distinguished (font bold + interior  RGB (242,242,242))
+'
+' http request on screen 2610 WEEKLY ROLLNG to test values if OK - seperate branch
+' - new classes req: CorailDataFrom2610, Corail_2610_Screen, SuitableData2610
+' http request on screen 3560 - to verify - seperate branch of code to test also
+' - new classes req: CorailDataFrom3560, Corail_3560_Screen, SuitableData3560
+' http request to check 3040 - with even hourly rqms - with also long range for Tychy
+' put common logic which will usable also for Fire Flake Hourly - put same interface
+' new classes req: CorailDataFrom3040, Corail_3040_Screen, SuitableData3040
+'
+' some estimated calc on TTIME
+' based on orders using initial diff in dates between DHEO and DHRQ
+'
+' to consider SuitableXtraDataXXXX - for metioned screens depending on req from osea team
+' ========================================================================================
+
+
+' version 0.11c Paulina ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-24
+' ========================================================================================
+' Class ; WeeklyLayout Ln 336 - 351 -  graphic adjustment : frame format, requirements distinguished
+' - ready for plant / COFOR Ln 380
+' "SLOTS" - deactivated
+' ribbon Corail image - changed
+' ========================================================================================
+
+
+
+' version 0.11b '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-12
+' ========================================================================================
+' !!! lets agree that : Public Sub main is untouchable - major logic to run only
+' general code like main public subs from class WeeklyCoverage
+' Class; WeeklyLayout - ILayout_finalTouchOnRep ; remove Gridlines of output
+' reallocate remove gridline to seperate sub finalTouch recognize which sheet is which
+' Class; WeeklyCoverage - report sheet - hidden ?? - only prototype sheet
+' probably will be deleted in next version
+' coverage column B - autofit - to be redefined anyway later, but ok
+' simple ribbon created - OK -> design zostawiam Tobie (Ribbon Module OK)
+' ========================================================================================
+
+
+
+
+' version 0.11a Paulina '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-10 09:00
+' ========================================================================================
+' Class; WeeklyLayout - ILayout_finalTouchOnRep ; remove Gridlines of output
+' Class; WeeklyCoverage - report sheet - hidden
+' coverage column B - autofit
+' simple ribbon created
+' ========================================================================================
+
+
+
 ' version 0.10
 ' update: 2019-06-03 15:00
 ' ========================================================================================

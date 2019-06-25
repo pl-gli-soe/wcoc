@@ -65,7 +65,7 @@ Private Sub export_this_project()
          
     Next VBComp
     
-    MsgBox "ready!"
+    MsgBox "ready!", vbInformation
 
 End Sub
 
@@ -101,7 +101,7 @@ Private Sub import_this_project()
         ' ==============================================================
     Next objFile
     
-    MsgBox "ready!"
+    MsgBox "ready!", vbInformation
 
 End Sub
 
@@ -136,6 +136,6 @@ Private Sub remove_current_implementation()
          
     Next VBComp
     
-    MsgBox "ready!"
+    MsgBox "ready!", vbInformation
 
 End Sub
