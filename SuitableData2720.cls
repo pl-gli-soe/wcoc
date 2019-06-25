@@ -49,6 +49,15 @@ Public internals As String
 Public majorComment As String
 
 
+' cofors added
+Public vendorCofor As String
+Public shipperCofor As String
+Public manufacturerCofor As String
+
+' supplier name
+Public supplierName As String
+
+
 Private item As CoverageItem
 Private collectionOfCovLines As Collection
 
