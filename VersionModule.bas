@@ -44,13 +44,18 @@ Attribute VB_Name = "VersionModule"
 ' ==================================== TO DO =============================================
 
 ' ========================================================================================
-' TT marking
-' supplier name / COFOR to be added
-' plt name to be added
-' Adding schedules (3560 as per DHRQ) - as per most recent calc. date
+' !!!  TT marking
+' !!!  Adding schedules (3560 as per DHRQ) - as per most recent calc. date
+'
+' not complete working week to be distinguished / Italic + interior RGB(189, 215, 238
 ' in comment  DHRQ / DHEO limit to date only
 ' "SLOTs" - TBD
-' coverage requirements line to be distinguished (font bold + interior  RGB (242,242,242))
+'
+' safety LUO to be added
+' after week 31/19 = > PFEB version on Corail parts to be developed
+' **************************************************************************************
+' **************************************************************************************
+'
 '
 ' http request on screen 2610 WEEKLY ROLLNG to test values if OK - seperate branch
 ' - new classes req: CorailDataFrom2610, Corail_2610_Screen, SuitableData2610
@@ -65,6 +70,50 @@ Attribute VB_Name = "VersionModule"
 '
 ' to consider SuitableXtraDataXXXX - for metioned screens depending on req from osea team
 ' ========================================================================================
+' ========================================================================================
+
+
+
+' version 0.13 20191001
+' ========================================================================================
+' ========================================================================================
+' zmiana w klasie Parser, wczesniej bylo tylko 5 kolumn teraz jest 7
+' <TH class=ecwTableSortable>Date</TH>
+' <TH class=ecwTableSortable>SGR/Line</TH>
+' <TH>CLV</TH>
+' <TH>Fab Plan</TH>
+' <th class="">Assembly</th> -> NOWE
+' <th class="">Machining</th> -> NOWE
+' <TH>Total</TH>
+' obsluga w podwojnej petli teraz z dynamicznym szukaniem ostatniej kolumny w xtra requirements, zamiast statycznego przypisania jako kolumny 5
+' zatem, jesli jedne planty w Corail dalej beda miec 5 kolumn to WCOC zlapie total zarowno jako kolumne 5 jak i 7 smart sam.
+' ========================================================================================
+' ========================================================================================
+
+
+' version 0.12b P ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-07-19
+' ========================================================================================
+' clear group extended
+' ribbon - status information added
+' total 17 lines
+' ========================================================================================
+
+
+' version 0.12a P ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-26 / 2019-06-27
+' ========================================================================================
+' Class; WeeklyLayout; change from Vendor to shipper cofor / Vendor Cofor moved / plant position adjusted
+' Class; WeeklyCoverage; Ln 81 - added where new report sheet shall be placed
+' Class; WeeklyLayout; Ln 271 quantities shipped to be marked with interior RGB (255,255,160) (slight modification may be needed later for <>0)
+' - - - - - - - - - - - - - - - - - - -
+' TO DO List updated - removed items:
+' supplier name / COFOR to be added
+' plt name to be added
+' coverage requirements line to be distinguished (font bold + interior  RGB (242,242,242))
+' quantities shipped to be marked with interior RGB (255,255,160) if different from 0
+' ========================================================================================
+
 
 
 ' version 0.12 -> 2019-06-25 -> DODATKOWY BACKEND
@@ -78,7 +127,7 @@ Attribute VB_Name = "VersionModule"
 '
 ' klasa WeeklyCoverage line: 205 - poniewaz nie ma sensu na sile szukania plt code na serwerze
 ' zwyczajnie pobralem nazwe plantu z listy input, poniewaz i tak decyzja otwierania wybranego serwera
-' opiera sie na wpisie w kolumne PLT w input
+' opiera sie na wpisie w kolumne PLT w input                                                                          -->  ''''''OK''''''
 ' jednak zachowujac std suitable data dla klasy: SuitableData2720 property plt: line 28 -> Public plt As String
 '
 ' parsing pod cofory:
@@ -100,15 +149,13 @@ Attribute VB_Name = "VersionModule"
 ' ========================================================================================
 
 
-
-
-' version 0.11c Paulina ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' version 0.11c P ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' update: 2019-06-24
 ' ========================================================================================
 ' Class ; WeeklyLayout Ln 336 - 351 -  graphic adjustment : frame format, requirements distinguished
 ' - ready for plant / COFOR Ln 380
 ' "SLOTS" - deactivated
-' ribbon Corail image - changed
+' ribbon Corail image - changed to png (background removed)
 ' ========================================================================================
 
 

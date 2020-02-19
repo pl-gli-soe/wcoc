@@ -77,3 +77,31 @@ Public Sub clearList(ictrl As IRibbonControl)
     End If
     
 End Sub
+
+
+Sub deleteThisSheet(control As IRibbonControl)
+
+    Application.DisplayAlerts = False
+    Application.EnableEvents = False
+    
+    If (ActiveSheet.Name Like "*input*") Then
+        MsgBox "You cannot delete this sheet!", vbCritical
+    Else
+        ActiveSheet.Delete
+    End If
+     
+    Application.EnableEvents = True
+    Application.DisplayAlerts = True
+
+End Sub
+
+
+Sub statusSHow(control As IRibbonControl)
+    StatusForm.show
+End Sub
+
+
+Sub goToInput(control As IRibbonControl)
+    ThisWorkbook.Worksheets("input").Activate
+End Sub
+

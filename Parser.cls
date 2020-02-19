@@ -455,15 +455,15 @@ Private Sub innerParse2720()
             ' <TH class=ecwTableSortable>SGR/Line</TH>
             ' <TH>CLV</TH>
             ' <TH>Fab Plan</TH>
+            ' <th class="">Assembly</th>
+            ' <th class="">Machining</th>
             ' <TH>Total</TH>
-            
+            howManyI = 0
             For Each r In tb.Rows
             
                 i = 0
-                
                 Set txri = Nothing
-                
-
+        
                 For Each c In r.Cells
                 
                 
@@ -472,6 +472,12 @@ Private Sub innerParse2720()
                     ' using here:
                     ' forceStringToBeDouble()
                     ' parseStringToDate()
+                    
+                    
+                    If c.tagName = "TH" Then
+                        howManyI = howManyI + 1
+                    End If
+                    
                     
                     
                     If c.tagName = "TD" Then
@@ -500,7 +506,7 @@ Private Sub innerParse2720()
                             txri.fabPlan = forceStringToBeDouble(Trim(c.innerText))
                         End If
                         
-                        If i = 4 Then
+                        If i = (howManyI - 1) Then
                             ' div total
                             txri.Total = forceStringToBeDouble(Trim(c.innerText))
                         End If

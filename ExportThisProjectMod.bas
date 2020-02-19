@@ -32,7 +32,7 @@ Attribute VB_Name = "ExportThisProjectMod"
 ' OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-Global Const REPO_PATH = "C:\WORKSPACE\macros\coverage\wcoc\repo\"
+Global Const REPO_PATH = "C:\WORKSPACE\dev\coverage\wcoc\repo\"
 
 Private Sub export_this_project()
     

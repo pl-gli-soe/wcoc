@@ -87,7 +87,7 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant, Optional bo
     
 
     ' new rep
-    Set repWorksheet = ThisWorkbook.Sheets.Add
+    Set repWorksheet = ThisWorkbook.Sheets.Add(After:=Worksheets(Worksheets.Count))
     repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
     repWorksheet.Cells(1, 2).Value = "BIND: "
     
@@ -129,7 +129,8 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant, Optional bo
     
     theLayout.finalTouchOnRep repWorksheet
     If boolOrderList Then theLayout.finalTouchOnRep ordersWorksheet
-
+    
+    
     
 End Sub
 
