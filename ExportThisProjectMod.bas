@@ -32,7 +32,7 @@ Attribute VB_Name = "ExportThisProjectMod"
 ' OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-Global Const REPO_PATH = "C:\WORKSPACE\macros\coverage\wcoc\repo\"
+Global Const REPO_PATH = "C:\WORKSPACE\dev\coverage\wcoc\repo\"
 
 Private Sub export_this_project()
     
@@ -65,7 +65,7 @@ Private Sub export_this_project()
          
     Next VBComp
     
-    MsgBox "ready!"
+    MsgBox "ready!", vbInformation
 
 End Sub
 
@@ -101,7 +101,7 @@ Private Sub import_this_project()
         ' ==============================================================
     Next objFile
     
-    MsgBox "ready!"
+    MsgBox "ready!", vbInformation
 
 End Sub
 
@@ -136,6 +136,6 @@ Private Sub remove_current_implementation()
          
     Next VBComp
     
-    MsgBox "ready!"
+    MsgBox "ready!", vbInformation
 
 End Sub

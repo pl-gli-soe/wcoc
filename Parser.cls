@@ -455,15 +455,15 @@ Private Sub innerParse2720()
             ' <TH class=ecwTableSortable>SGR/Line</TH>
             ' <TH>CLV</TH>
             ' <TH>Fab Plan</TH>
+            ' <th class="">Assembly</th>
+            ' <th class="">Machining</th>
             ' <TH>Total</TH>
-            
+            howManyI = 0
             For Each r In tb.Rows
             
                 i = 0
-                
                 Set txri = Nothing
-                
-
+        
                 For Each c In r.Cells
                 
                 
@@ -472,6 +472,12 @@ Private Sub innerParse2720()
                     ' using here:
                     ' forceStringToBeDouble()
                     ' parseStringToDate()
+                    
+                    
+                    If c.tagName = "TH" Then
+                        howManyI = howManyI + 1
+                    End If
+                    
                     
                     
                     If c.tagName = "TD" Then
@@ -500,7 +506,7 @@ Private Sub innerParse2720()
                             txri.fabPlan = forceStringToBeDouble(Trim(c.innerText))
                         End If
                         
-                        If i = 4 Then
+                        If i = (howManyI - 1) Then
                             ' div total
                             txri.Total = forceStringToBeDouble(Trim(c.innerText))
                         End If
@@ -538,7 +544,9 @@ Private Sub innerParse2720()
             ' Debug.Print sd.pn OK!
             ' ---------------------------------------------------------------------
             
+                        
             
+                      
             ' suitable data for PLT
             ' ---------------------------------------------------------------------
             Set inputElement = d.getDom.idoc.getElementById("stockDepart")
@@ -553,6 +561,44 @@ Private Sub innerParse2720()
             ' ---------------------------------------------------------------------
             
             
+            ' suitable data for cofors
+            ' ---------------------------------------------------------------------
+            Set inputElement = d.getDom.idoc.getElementById("psp.vendor.cofor")
+            sd.vendorCofor = CStr(inputElement.Value)
+            
+            Set inputElement = d.getDom.idoc.getElementById("psp.shipper.cofor")
+            sd.shipperCofor = CStr(inputElement.Value)
+            
+            Set inputElement = d.getDom.idoc.getElementById("psp.manufacturer.cofor")
+            sd.manufacturerCofor = CStr(inputElement.Value)
+            
+            
+            ' z supplier name jest nieco bardziej tricky
+            ' ------------------------------------------------------------------------------
+            Dim ec As IHTMLElementCollection
+            
+            Set tb = d.getDom.idoc.getElementById("tableauFluxDePiece")
+            ' w tabeli powyzej znajduja sie dodatkowo cztery sub-tabele - wybieramy ostatnia
+            ' wg tego co widac w html to wlasnie w ostatniej znajduje sie supplier name
+            Set tb = tb.getElementsByTagName("table")(3) ' jako celle 4tej sub-tabeli html
+            Set ec = tb.getElementsByTagName("td")
+            ' szukamy teraz statycznego formotowania, ktore jest specyficzne dla nazwy dostawcy
+            ' oczywiscie heurystycznie, wiec nie zdziwie sie jak kiedys przestanie dzialac poprawnie :D
+            ' szukamy boldu i dopasowania textu:
+            ' font-weight: bold; text-align: left
+            Dim tdElement As IHTMLElement
+            iterator = 1
+            For Each tdElement In ec
+            
+                ' Debug.Print tdElement.Style & " outer: " & tdElement.outerHTML
+                
+                If tdElement.outerHTML Like "*FONT-WEIGHT: bold*TEXT-ALIGN: left*colSpan=2*" Then
+                    sd.supplierName = tdElement.innerHTML
+                    Exit For
+                End If
+                
+                iterator = iterator + 1
+            Next
             
             
             ' get full table from top of the 2720
@@ -565,7 +611,7 @@ Private Sub innerParse2720()
             
             Set tb = d.getDom.idoc.getElementById("tableauIdentificationProduct")
             
-            Dim ec As IHTMLElementCollection
+            
             ' .getDom.doc.getElementsByTagName
             Set ec = tb.getElementsByTagName("input")
             

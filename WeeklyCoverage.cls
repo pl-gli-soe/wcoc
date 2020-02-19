@@ -72,7 +72,7 @@ Private Sub Class_Terminate()
 End Sub
 
 
-Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
+Private Sub ICoverage_runCoverage(login As Variant, pass As Variant, Optional boolOrderList As Boolean)
 
 
 
@@ -80,26 +80,38 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     ' -------------------------------------
     httpReq.setup login, pass
     ' -------------------------------------
+    
+    
+
+    
+    
 
     ' new rep
-    Set repWorksheet = ThisWorkbook.Sheets.Add
+    Set repWorksheet = ThisWorkbook.Sheets.Add(After:=Worksheets(Worksheets.Count))
     repWorksheet.Cells(1, 1).Value = "Weekly Coverage on Corail, new rep: " & CStr(Now)
     repWorksheet.Cells(1, 2).Value = "BIND: "
     
     Set repCell = repWorksheet.Cells(2, 1)
     
-    ' new order rep
-    Set ordersWorksheet = ThisWorkbook.Sheets.Add
-    ordersWorksheet.Cells(1, 1).Value = "Order list on Corail, new rep: " & CStr(Now)
-    Set orderCell = ordersWorksheet.Cells(2, 1)
-    fillWithLabels ordersWorksheet, orderCell
-    Set orderCell = orderCell.Offset(1, 0)
     
-    ordersWorksheet.Cells(1, 2).Value = "BIND: "
-    ordersWorksheet.Cells(1, 3).Value = repWorksheet.Name
+    If boolOrderList Then
     
-    ' repWorksheet.Cells(1, 2).Value = "BIND: "
-    repWorksheet.Cells(1, 3).Value = ordersWorksheet.Name
+        ' new order rep
+        Set ordersWorksheet = ThisWorkbook.Sheets.Add
+        ordersWorksheet.Cells(1, 1).Value = "Order list on Corail, new rep: " & CStr(Now)
+        Set orderCell = ordersWorksheet.Cells(2, 1)
+        fillWithLabels ordersWorksheet, orderCell
+        Set orderCell = orderCell.Offset(1, 0)
+        
+        ordersWorksheet.Cells(1, 2).Value = "BIND: "
+        ordersWorksheet.Cells(1, 3).Value = repWorksheet.Name
+        
+        ' repWorksheet.Cells(1, 2).Value = "BIND: "
+        repWorksheet.Cells(1, 3).Value = ordersWorksheet.Name
+    
+    End If
+    
+
 
     initialSetupForInputList ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM)
     
@@ -109,13 +121,16 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant)
     
     Do
         
-        makeInteration inputRef
+        makeInteration inputRef, boolOrderList
     
         Set inputRef = inputRef.Offset(1, 0)
     Loop Until Trim(inputRef) = ""
     
     
     theLayout.finalTouchOnRep repWorksheet
+    If boolOrderList Then theLayout.finalTouchOnRep ordersWorksheet
+    
+    
     
 End Sub
 
@@ -123,7 +138,7 @@ End Sub
 ' ===========================================================================
 ' ===========================================================================
 ' MAIN LOGIC FOR ONE ITERATION - ONE PART NUMBER
-Private Sub makeInteration(ByRef inputRef As Range)
+Private Sub makeInteration(ByRef inputRef As Range, ByRef boolOrderList As Boolean)
 
 
     ' ----------------------------------------------------------------------------------------------------------
@@ -197,6 +212,7 @@ Private Sub makeInteration(ByRef inputRef As Range)
             
             Dim suitableDataFrom2720 As SuitableData2720, ci As CoverageItem
             Set suitableDataFrom2720 = theCorailData.getSuitableData()
+            suitableDataFrom2720.plt = CStr(plt)
             
             ' OK
             ' Debug.Print "suitableDataFrom2720.stock: " & suitableDataFrom2720.stock
@@ -223,39 +239,11 @@ Private Sub makeInteration(ByRef inputRef As Range)
             Set suitableDataCalcFrom2510 = theCorailData.getSuitableData()
             
             
-            Dim r As Range
             
-            
-            Set r = orderCell
-            
-            ' Debug.Print "suit.getOrders() count: " & suitableDataCalcFrom2510.getOrders().Count
-            
-            
-            
-            For Each oi In suitableDataCalcFrom2510.getOrders()
-            
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_PLT) = plt
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_PN) = oi.getElement(E_2510_PRODUCT)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_SGR) = oi.getElement(E_2510_SGR_LINE)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_QTY) = oi.getElement(E_2510_QTY)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_ORDER_NUM) = oi.getElement(E_2510_ORDER_NUMBER)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_DN) = oi.getElement(E_2510_DN)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEO) = oi.getElement(E_2510_DHEO)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEF) = oi.getElement(E_2510_DHEF)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHAS) = oi.getElement(E_2510_DHAS)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_DHRQ) = oi.getElement(E_2510_DHRQ)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_SELLER) = oi.getElement(E_2510_SELLER)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_SHIPPER) = oi.getElement(E_2510_SHIPPER)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_TYPE) = oi.getElement(E_2510_TYPE)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_UM) = oi.getElement(E_2510_UM)
-                r.Offset(0, WCOC.E_ORDER_LIST_REP_STATUS) = oi.getElement(E_2510_S2)
-                
-                
-                Set r = r.Offset(1, 0)
-            Next oi
-            
-            ' set next empty position for next part number
-            Set orderCell = r
+            ' optional now!
+            ' --------------------------------------------------------------------------
+            doPortionOfOrdersIf boolOrderList, suitableDataCalcFrom2510, oi
+            ' --------------------------------------------------------------------------
             
             
             
@@ -287,6 +275,48 @@ Private Sub makeInteration(ByRef inputRef As Range)
 End Sub
 ' ===========================================================================
 ' ===========================================================================
+
+
+
+Private Sub doPortionOfOrdersIf(ByRef bol As Boolean, ByRef suitableDataCalcFrom2510 As SuitableData2510, ByRef oi As OrderItem)
+    
+    If CBool(bol) Then
+            
+         Dim r As Range
+         
+         
+         Set r = orderCell
+         
+         ' Debug.Print "suit.getOrders() count: " & suitableDataCalcFrom2510.getOrders().Count
+         
+         
+         
+         For Each oi In suitableDataCalcFrom2510.getOrders()
+         
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_PLT) = plt
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_PN) = oi.getElement(E_2510_PRODUCT)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_SGR) = oi.getElement(E_2510_SGR_LINE)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_QTY) = oi.getElement(E_2510_QTY)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_ORDER_NUM) = oi.getElement(E_2510_ORDER_NUMBER)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_DN) = oi.getElement(E_2510_DN)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEO) = oi.getElement(E_2510_DHEO)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_DHEF) = oi.getElement(E_2510_DHEF)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_DHAS) = oi.getElement(E_2510_DHAS)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_DHRQ) = oi.getElement(E_2510_DHRQ)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_SELLER) = oi.getElement(E_2510_SELLER)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_SHIPPER) = oi.getElement(E_2510_SHIPPER)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_TYPE) = oi.getElement(E_2510_TYPE)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_UM) = oi.getElement(E_2510_UM)
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_STATUS) = oi.getElement(E_2510_S2)
+             
+             
+             Set r = r.Offset(1, 0)
+         Next oi
+         
+         ' set next empty position for next part number
+         Set orderCell = r
+    End If
+End Sub
 
 
 Private Sub makeLineInCoverageRep(main2720data As SuitableData2720, r As Range)

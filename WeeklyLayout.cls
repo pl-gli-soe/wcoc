@@ -64,13 +64,40 @@ End Sub
 
 Private Sub ILayout_finalTouchOnRep(rep As Worksheet)
     
+
+    If rep.Cells(1, 1).Value Like "Weekly Coverage on Corail*" Then
+        repFinalTouch rep
+    Else
+        ordersFinalTouch rep
+    End If
+End Sub
+
+
+Private Sub repFinalTouch(rep As Worksheet)
     rep.Columns("A:A").ColumnWidth = 4
-    rep.Columns("B:B").ColumnWidth = 17
-    rep.Columns("C:C").ColumnWidth = 8
+    ' rep.Columns("B:B").ColumnWidth = 17
+    rep.Columns("C:C").ColumnWidth = 4 ' changed from 8
     rep.Columns("D:D").ColumnWidth = 1
     rep.Columns("J:AC").ColumnWidth = 6
+    ''''''''''''''''''''''''''''''''''''
     
+    
+    ' Paulina
+    ''''''''''''''''''''''''''''''''''''
+    rep.Columns("B:B").EntireColumn.AutoFit
     rep.Activate
+    '''''''''''''''''''''''''''''''''''''
+    ActiveWindow.DisplayGridlines = False
+    
+    '''''''''''''''''''''''''''''''''''''
+    '''''''''''''''''''''''''''''''''''''
+End Sub
+
+Private Sub ordersFinalTouch(o As Worksheet)
+
+    ' od kiedy tworzenie listy jest opcjonalne nie ma potrzeby juz jej chowac
+    ' jednak samego suba sobie zostawie dla potencjalnych przyszlych formowatowan
+    ' o.Visible = xlSheetHidden
 End Sub
 
 Private Sub ILayout_nowMergeWithDataFromCorail(r As Range, main2720data As SuitableData2720)
@@ -240,7 +267,6 @@ Private Function getShipmentsAndPutSomeComment(rfr As Range, d1 As Date, d2 As D
                         
                         ' now this is shipment so only EF or more
                         theStatus = oi.getElement(E_2510_S2)
-                        
                         If theStatus <> "EO" And theStatus <> "CA" And theStatus <> "FO" Then
                         
                         
@@ -250,7 +276,8 @@ Private Function getShipmentsAndPutSomeComment(rfr As Range, d1 As Date, d2 As D
                         
                             rfr.Comment.Text "" & rfr.Comment.Text & oi.getElement(E_2510_QTY) & "  " & oi.getElement(E_2510_SELLER) & "  " & oi.getElement(E_2510_SHIPPER) & "  " & oi.getElement(E_2510_TYPE) _
                                 & " " & oi.getElement(E_2510_S2) & "  " & oi.getElement(E_2510_DHEO) & "  " & oi.getElement(E_2510_DHRQ) & Chr(10)
-                        
+                         ''''''''''''''''''''''
+                            rfr.Interior.Color = RGB(255, 255, 160)
                         End If
                     Next oi
                     
@@ -316,16 +343,43 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     S.Cells(rrow, 1).Value = "PLT"
     S.Cells(rrow, 9).Value = "Past due"
     S.Cells(rrow, 7).Value = "First runout"
+    '========================================================
+
+    With S.Range(S.Cells(rrow + 1, 1), S.Cells(rrow + 5, 1))
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+        .Merge
+        .Orientation = 90
+        .Value = dataFromCorail.plt 'working
+        .HorizontalAlignment = xlCenter
+        .VerticalAlignment = xlCenter
+        .ReadingOrder = xlContext
+    End With
+    
+    ' color req
+    With S.Range(S.Cells(rrow + 1, 10), S.Cells(rrow + 1, 29))
+        .Interior.Color = RGB(242, 242, 242)
+        .Font.Color = RGB(0, 0, 0)
+        .Font.Bold = True
+    End With
+   
+    '========================================================
+    
     With S.Range(S.Cells(rrow, 1), S.Cells(rrow, 29))
         .Interior.Color = RGB(140, 140, 140)
         .Font.Color = RGB(255, 255, 255)
         .Font.Bold = True
     End With
     
+    tmp = dataFromCorail.supplierName
+    tmp = Mid(tmp, 8)
+    
     With S.Cells(rrow + 1, 2)
-        .Value = dataFromCorail.plt
-        .Interior.Color = RGB(140, 140, 140)
-        .Font.Color = RGB(255, 255, 255)
+        ' .Value = dataFromCorail.plt ' zatem tutaj wolny slot teraz
+        .Value = tmp ' dataFromCorail.supplierName ' wrzucilem tymczasowo - mozna zmienic! :)  '''' OK can stay ''''
+        .Interior.Color = RGB(183, 222, 232)
+        .Font.Color = RGB(0, 0, 0)
         .Font.Bold = True
     End With
     
@@ -336,9 +390,30 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     End With
     
     
+    
     S.Cells(rrow + 3, 2).Value = dataFromCorail.approId
-    S.Cells(rrow + 4, 2).Value = dataFromCorail.approName
-    ' S.Cells(rrow + 5, 2).Value = dataFromCorail.xxx
+    With S.Cells(rrow + 4, 2)
+        .Value = dataFromCorail.approName
+        .Font.Size = 9
+    End With
+    
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''
+    ' przykladowo wybralem vendor cofor - mozna teraz wybrac rowniez shipper oraz manufacturer / zmienione na shipper
+    ' ====> changed!!!
+    'S.Cells(rrow + 5, 2).Value = dataFromCorail.shipperCofor ==> put in comment in favour of Lns 388-399
+     With S.Cells(rrow + 5, 2)
+        .Value = dataFromCorail.shipperCofor
+        .Font.Color = RGB(0, 0, 0)
+        .Font.Bold = True
+    End With
+    
+    With S.Cells(rrow, 2)
+        .Value = "VENDOR / SELLER:     " & dataFromCorail.vendorCofor
+        .Interior.Color = RGB(140, 140, 140)
+        .Font.Color = RGB(255, 255, 255)
+        .Font.Bold = True
+    End With
+    
     
 
     ' tutaj specjalne miesjce pod ruchomy first runout
@@ -368,11 +443,11 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     End With
     
     
-    S.Cells(rrow + 1, 3).Value = "SLOT"
-    S.Cells(rrow + 2, 3).Value = "SLOT"
-    S.Cells(rrow + 3, 3).Value = "SLOT"
-    S.Cells(rrow + 4, 3).Value = "SLOT"
-    S.Cells(rrow + 5, 3).Value = "SLOT"
+    S.Cells(rrow + 1, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 2, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 3, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 4, 3).Value = "  " '"SLOT"
+    S.Cells(rrow + 5, 3).Value = "  " '"SLOT"
     
     With S.Range(S.Cells(rrow + 1, 3), S.Cells(rrow + 5, 3))
         .Interior.Color = RGB(140, 140, 140)
@@ -386,5 +461,7 @@ Private Sub pFormatCommonDataOnLeft(S As Worksheet, rrow As Long)
     S.Cells(rrow + 2, 6).Value = dataFromCorail.stock
     S.Cells(rrow + 3, 5).Value = "RECV"
     S.Cells(rrow + 3, 6).Value = dataFromCorail.recv
+    
+   
 
 End Sub

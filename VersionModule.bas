@@ -39,6 +39,154 @@ Attribute VB_Name = "VersionModule"
 
 
 
+' ========================================================================================
+
+' ==================================== TO DO =============================================
+
+' ========================================================================================
+' !!!  TT marking
+' !!!  Adding schedules (3560 as per DHRQ) - as per most recent calc. date
+'
+' not complete working week to be distinguished / Italic + interior RGB(189, 215, 238
+' in comment  DHRQ / DHEO limit to date only
+' "SLOTs" - TBD
+'
+' safety LUO to be added
+' after week 31/19 = > PFEB version on Corail parts to be developed
+' **************************************************************************************
+' **************************************************************************************
+'
+'
+' http request on screen 2610 WEEKLY ROLLNG to test values if OK - seperate branch
+' - new classes req: CorailDataFrom2610, Corail_2610_Screen, SuitableData2610
+' http request on screen 3560 - to verify - seperate branch of code to test also
+' - new classes req: CorailDataFrom3560, Corail_3560_Screen, SuitableData3560
+' http request to check 3040 - with even hourly rqms - with also long range for Tychy
+' put common logic which will usable also for Fire Flake Hourly - put same interface
+' new classes req: CorailDataFrom3040, Corail_3040_Screen, SuitableData3040
+'
+' some estimated calc on TTIME
+' based on orders using initial diff in dates between DHEO and DHRQ
+'
+' to consider SuitableXtraDataXXXX - for metioned screens depending on req from osea team
+' ========================================================================================
+' ========================================================================================
+
+
+
+' version 0.13 20191001
+' ========================================================================================
+' ========================================================================================
+' zmiana w klasie Parser, wczesniej bylo tylko 5 kolumn teraz jest 7
+' <TH class=ecwTableSortable>Date</TH>
+' <TH class=ecwTableSortable>SGR/Line</TH>
+' <TH>CLV</TH>
+' <TH>Fab Plan</TH>
+' <th class="">Assembly</th> -> NOWE
+' <th class="">Machining</th> -> NOWE
+' <TH>Total</TH>
+' obsluga w podwojnej petli teraz z dynamicznym szukaniem ostatniej kolumny w xtra requirements, zamiast statycznego przypisania jako kolumny 5
+' zatem, jesli jedne planty w Corail dalej beda miec 5 kolumn to WCOC zlapie total zarowno jako kolumne 5 jak i 7 smart sam.
+' ========================================================================================
+' ========================================================================================
+
+
+' version 0.12b P ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-07-19
+' ========================================================================================
+' clear group extended
+' ribbon - status information added
+' total 17 lines
+' ========================================================================================
+
+
+' version 0.12a P ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-26 / 2019-06-27
+' ========================================================================================
+' Class; WeeklyLayout; change from Vendor to shipper cofor / Vendor Cofor moved / plant position adjusted
+' Class; WeeklyCoverage; Ln 81 - added where new report sheet shall be placed
+' Class; WeeklyLayout; Ln 271 quantities shipped to be marked with interior RGB (255,255,160) (slight modification may be needed later for <>0)
+' - - - - - - - - - - - - - - - - - - -
+' TO DO List updated - removed items:
+' supplier name / COFOR to be added
+' plt name to be added
+' coverage requirements line to be distinguished (font bold + interior  RGB (242,242,242))
+' quantities shipped to be marked with interior RGB (255,255,160) if different from 0
+' ========================================================================================
+
+
+
+' version 0.12 -> 2019-06-25 -> DODATKOWY BACKEND
+''''''''''''''''''
+' ========================================================================================
+' wydzielenie tworzenia listy orderow do osobnego prywatnego suba doPortionOfOrdersIf
+' klasa WeeklyCoverage line:  235 -> definicja line: 271
+' co z tym idzie nowy checkbox w oknie logowania domyslnie false - nie bedzie trzeba juz chowac nic ->
+' decyzja z checkbox przechodzi jako zdefiniowany trzeci parametr main -> oraz na stale w interfejsie/klasie ICoverage
+' jako wymog implementacyjny przyszlych subklas typu ICoverage
+'
+' klasa WeeklyCoverage line: 205 - poniewaz nie ma sensu na sile szukania plt code na serwerze
+' zwyczajnie pobralem nazwe plantu z listy input, poniewaz i tak decyzja otwierania wybranego serwera
+' opiera sie na wpisie w kolumne PLT w input                                                                          -->  ''''''OK''''''
+' jednak zachowujac std suitable data dla klasy: SuitableData2720 property plt: line 28 -> Public plt As String
+'
+' parsing pod cofory:
+' z tabeli id: tableauFluxDePiece
+' kolejno:
+' <input type="hidden" name="psp.vendor.cofor" id="psp.vendor.cofor" value="A004HP  01">
+' <input type="hidden" name="psp.shipper.cofor" id="psp.shipper.cofor" value="A004HP  01">
+' <input type="hidden" name="psp.manufacturer.cofor" id="psp.manufacturer.cofor" value="A004HP  01">
+' sa dostepne bezposrednie ID w HTML wiec szybko, latwo i przyjemnie
+' pozostawiam do wyboru, ktory chcemy miec dostepny w wygenerowanym coverage
+'
+' klasa suitable data 2720 new properties (cofors): line 44
+' and also klasa Parser new line: 550 -> parsing data from 2720 directly by ID into SuitableData (COFORS)
+' jednak supplier name jest nieco bardziej wymagajacy z powodu braku referencji - trzeba szukac posrednio
+' poprzez petle elementow td
+' WeeklyLayout -> line 266 -> wrzucilem nazwe tymczasowo tutaj -> mozna zmieniac.
+'
+'
+' ========================================================================================
+
+
+' version 0.11c P ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-24
+' ========================================================================================
+' Class ; WeeklyLayout Ln 336 - 351 -  graphic adjustment : frame format, requirements distinguished
+' - ready for plant / COFOR Ln 380
+' "SLOTS" - deactivated
+' ribbon Corail image - changed to png (background removed)
+' ========================================================================================
+
+
+
+' version 0.11b '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-12
+' ========================================================================================
+' !!! lets agree that : Public Sub main is untouchable - major logic to run only
+' general code like main public subs from class WeeklyCoverage
+' Class; WeeklyLayout - ILayout_finalTouchOnRep ; remove Gridlines of output
+' reallocate remove gridline to seperate sub finalTouch recognize which sheet is which
+' Class; WeeklyCoverage - report sheet - hidden ?? - only prototype sheet
+' probably will be deleted in next version
+' coverage column B - autofit - to be redefined anyway later, but ok
+' simple ribbon created - OK -> design zostawiam Tobie (Ribbon Module OK)
+' ========================================================================================
+
+
+
+
+' version 0.11a Paulina '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' update: 2019-06-10 09:00
+' ========================================================================================
+' Class; WeeklyLayout - ILayout_finalTouchOnRep ; remove Gridlines of output
+' Class; WeeklyCoverage - report sheet - hidden
+' coverage column B - autofit
+' simple ribbon created
+' ========================================================================================
+
+
+
 ' version 0.10
 ' update: 2019-06-03 15:00
 ' ========================================================================================

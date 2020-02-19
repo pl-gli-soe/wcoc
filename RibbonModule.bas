@@ -1,5 +1,5 @@
-Attribute VB_Name = "mainModule"
-''
+Attribute VB_Name = "RibbonModule"
+'
 ' __        __        _    _          ____
 ' \ \      / /__  ___| | _| |_   _   / ___|_____   _____ _ __ __ _  __ _  ___
 '  \ \ /\ / / _ \/ _ \ |/ / | | | | | |   / _ \ \ / / _ \ '__/ _` |/ _` |/ _ \
@@ -13,6 +13,7 @@ Attribute VB_Name = "mainModule"
 '
 '01010111 01100101 01100101 01101011 01101100 01111001  01000011 01101111 01110110 01100101 01110010 01100001 01100111 01100101
 '01101111 01101110  01000011 01101111 01110010 01100001 01101001 01101100
+'
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
@@ -36,19 +37,71 @@ Attribute VB_Name = "mainModule"
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
 
-
-Public Sub onClick()
-    
-    LoginForm.show
+Public Sub RunMain(ictrl As IRibbonControl)
+    onClick
 End Sub
 
-Public Sub main(login As String, pass As String, xtraOrderList As Boolean)
+
+Public Sub deleteOld(ictrl As IRibbonControl)
+    Application.EnableEvents = False
+
+    ret = MsgBox("Are you sure?", vbQuestion + vbYesNo)
+    If ret = vbYes Then
+        Application.DisplayAlerts = False
+        
+        x = 1
+        Do
+            If (Sheets(x).Name Like "*input*") Then
+                x = x + 1
+            Else
+                Sheets(x).Delete
+            End If
+        Loop Until x > Sheets.Count
+        Application.DisplayAlerts = True
+    End If
     
-    Dim cov As ICoverage
     
-    Set cov = New WeeklyCoverage
-    cov.runCoverage CStr(login), CStr(pass), CBool(xtraOrderList)
+    Application.EnableEvents = True
     
-    
-    MsgBox "ready!", vbInformation
 End Sub
+
+Public Sub clearList(ictrl As IRibbonControl)
+    
+    If ActiveSheet.Name = "input" Then
+    
+        Range("A2:D10000").ClearContents
+        Range("A2").Select
+    Else
+    
+        MsgBox "Go to INPUT and try again!", vbExclamation
+    End If
+    
+End Sub
+
+
+Sub deleteThisSheet(control As IRibbonControl)
+
+    Application.DisplayAlerts = False
+    Application.EnableEvents = False
+    
+    If (ActiveSheet.Name Like "*input*") Then
+        MsgBox "You cannot delete this sheet!", vbCritical
+    Else
+        ActiveSheet.Delete
+    End If
+     
+    Application.EnableEvents = True
+    Application.DisplayAlerts = True
+
+End Sub
+
+
+Sub statusSHow(control As IRibbonControl)
+    StatusForm.show
+End Sub
+
+
+Sub goToInput(control As IRibbonControl)
+    ThisWorkbook.Worksheets("input").Activate
+End Sub
+
