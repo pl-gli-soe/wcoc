@@ -53,6 +53,8 @@ Public Sub deleteOld(ictrl As IRibbonControl)
         Do
             If (Sheets(x).Name Like "*input*") Then
                 x = x + 1
+            ElseIf UCase(Sheets(x).Name) = "TRANSIT" Then
+                x = x + 1
             Else
                 Sheets(x).Delete
             End If
@@ -86,6 +88,8 @@ Sub deleteThisSheet(control As IRibbonControl)
     
     If (ActiveSheet.Name Like "*input*") Then
         MsgBox "You cannot delete this sheet!", vbCritical
+    ElseIf (ActiveSheet.Name Like "*TRANSIT*") Then
+        MsgBox "You cannot delete this sheet!", vbCritical
     Else
         ActiveSheet.Delete
     End If
@@ -97,7 +101,7 @@ End Sub
 
 
 Sub statusSHow(control As IRibbonControl)
-    StatusForm.show
+    StatusForm1.show
 End Sub
 
 

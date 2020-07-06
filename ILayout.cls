@@ -36,6 +36,9 @@ Attribute VB_Exposed = False
 Public Sub setLayout(typeOfLayout As E_TYPE_OF_LAYOUT)
 End Sub
 
+Public Sub setHowManyWeeks(mhmw As Integer)
+End Sub
+
 Public Sub putSomeColorsForThisPartNumber(r As Range)
 End Sub
 

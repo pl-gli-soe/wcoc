@@ -2,11 +2,13 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "CorailDataFrom2510"
+Attribute VB_Name = "CorailDataFrom6510"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2019 FORREST
@@ -37,11 +39,11 @@ Implements ICorailData
 Private rawString As String
 Private theDomHandler As DOMHandler
 Private theParser As IParser
-Private sd As SuitableData2510
+Private sd As SuitableData6510
 
 
 ' collection for collecting rawString and theDomHandler
-Private collectionOfDataFrom2510 As Collection
+Private collectionOfDataFrom6510 As Collection
 
 Private numberOfElements As Long
 Private currentPage As Integer
@@ -52,7 +54,7 @@ Private Sub Class_Initialize()
     rawString = ""
     Set theDomHandler = New DOMHandler
     Set theParser = New Parser
-    Set collectionOfDataFrom2510 = New Collection
+    Set collectionOfDataFrom6510 = New Collection
     numberOfElements = 0
     currentPage = 0
     currentPageSize = 0
@@ -63,7 +65,7 @@ Private Sub Class_Terminate()
     rawString = ""
     Set theDomHandler = Nothing
     Set theParser = Nothing
-    Set collectionOfDataFrom2510 = Nothing
+    Set collectionOfDataFrom6510 = Nothing
     numberOfElements = 0
     currentPage = 0
     currentPageSize = 0
@@ -71,7 +73,7 @@ Private Sub Class_Terminate()
 End Sub
 
 Private Function ICorailData_getCollectionOfData() As Collection
-    Set ICorailData_getCollectionOfData = collectionOfDataFrom2510
+    Set ICorailData_getCollectionOfData = collectionOfDataFrom6510
 End Function
 
 Private Function ICorailData_getString() As String
@@ -100,16 +102,17 @@ Private Sub ICorailData_parseString()
     Dim buffColl As Collection
     Set buffColl = New Collection
     
-    For Each txt In collectionOfDataFrom2510
+    Dim txt As Variant
+    For Each txt In collectionOfDataFrom6510
         txt = "<style> table tr td { padding: 4px; }</style>" & chr(10) & txt
         buffColl.Add txt
     Next txt
     
-    Set collectionOfDataFrom2510 = Nothing
-    Set collectionOfDataFrom2510 = New Collection
+    Set collectionOfDataFrom6510 = Nothing
+    Set collectionOfDataFrom6510 = New Collection
     
     For Each txt In buffColl
-        collectionOfDataFrom2510.Add txt
+        collectionOfDataFrom6510.Add txt
     Next txt
     
     Set buffColl = Nothing
@@ -138,6 +141,9 @@ End Sub
 Private Sub ICorailData_setString(arg As String)
     rawString = arg
     
+    Dim firstLine As Variant
+    Dim arr As Variant, tmp As String
+    
     With theDomHandler
         Set .doc = New HTMLDocument
         Set .idoc = New HTMLDocument
@@ -153,7 +159,7 @@ Private Sub ICorailData_setString(arg As String)
     
     
     Dim newVal As Long
-    
+    Dim x As Variant
     For x = LBound(arr) To UBound(arr)
         ' Debug.Print arr(x)
         
@@ -197,8 +203,9 @@ Private Sub ICorailData_setString(arg As String)
     Debug.Print "ICorailData_setString: num " & numberOfElements & " curr p: " & currentPage & " pages: " & pages
     
     If CLng(currentPage) <= CLng(pages) Then
-        collectionOfDataFrom2510.Add arg
+        collectionOfDataFrom6510.Add arg
     End If
     
 End Sub
+
 

@@ -45,6 +45,8 @@ Private theLayout As ILayout
 Private repWorksheet As Worksheet
 Private repCell As Range
 
+Private howManyColumns As Integer
+
 Private ordersWorksheet As Worksheet
 Private orderCell As Range
 
@@ -72,7 +74,9 @@ Private Sub Class_Terminate()
 End Sub
 
 
-Private Sub ICoverage_runCoverage(login As Variant, pass As Variant, Optional boolOrderList As Boolean)
+Private Sub ICoverage_runCoverage(login As Variant, pass As Variant, _
+    Optional boolOrderList As Boolean, Optional withForecast As Boolean, _
+    Optional hmc As Integer)
 
 
 
@@ -119,16 +123,39 @@ Private Sub ICoverage_runCoverage(login As Variant, pass As Variant, Optional bo
     ' starting point
     Set inputRef = ThisWorkbook.Sheets(WCOC.G_INPUT_SH_NM).Range("A2")
     
+    Dim sh As New StatusHandler
+    sh.init_statusbar CLng(inputRef.Offset(-1, 0).End(xlDown).Row)
+    
+    DoEvents
+    sh.show
+    DoEvents
+    StatusForm.Repaint
+    
     Do
+    
+        If inputRef.EntireRow.Hidden Then
+        Else
         
-        makeInteration inputRef, boolOrderList
+            makeInteration inputRef, boolOrderList, withForecast, hmc
+            
+            sh.progress_increase
+        End If
     
         Set inputRef = inputRef.Offset(1, 0)
     Loop Until Trim(inputRef) = ""
     
     
+    
+    
     theLayout.finalTouchOnRep repWorksheet
     If boolOrderList Then theLayout.finalTouchOnRep ordersWorksheet
+    
+    
+    sh.progress_increase
+    
+    sh.hide
+    
+    Set sh = Nothing
     
     
     
@@ -138,7 +165,7 @@ End Sub
 ' ===========================================================================
 ' ===========================================================================
 ' MAIN LOGIC FOR ONE ITERATION - ONE PART NUMBER
-Private Sub makeInteration(ByRef inputRef As Range, ByRef boolOrderList As Boolean)
+Private Sub makeInteration(ByRef inputRef As Range, ByRef boolOrderList As Boolean, ByRef withForecast As Boolean, Optional hmc As Integer)
 
 
     ' ----------------------------------------------------------------------------------------------------------
@@ -232,27 +259,64 @@ Private Sub makeInteration(ByRef inputRef As Range, ByRef boolOrderList As Boole
             
             ' 2510
             ' --------------------------------------------------------------
-            Set theCorailData = theCorail.getDataFromScreen(plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC)
+            
+            
             ' Debug.Print "theCorailData: " & TypeName(theCorailData) ' OK
             
             Dim suitableDataCalcFrom2510 As SuitableData2510, oi As OrderItem
-            Set suitableDataCalcFrom2510 = theCorailData.getSuitableData()
             
             
             
-            ' optional now!
-            ' --------------------------------------------------------------------------
-            doPortionOfOrdersIf boolOrderList, suitableDataCalcFrom2510, oi
-            ' --------------------------------------------------------------------------
+            If withForecast Then
+                Set theCorailData = theCorail.getDataFromScreen(plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC_WITH_FORECAST)
+                Set suitableDataCalcFrom2510 = theCorailData.getSuitableData()
+                suitableDataCalcFrom2510.plt = CStr(plt)
+                doPortionOfOrdersIf boolOrderList, suitableDataCalcFrom2510, oi
+            Else
+                ' without
+                Set theCorailData = theCorail.getDataFromScreen(plt, pn, E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC)
+                Set suitableDataCalcFrom2510 = theCorailData.getSuitableData()
+                suitableDataCalcFrom2510.plt = CStr(plt)
+                doPortionOfOrdersIf boolOrderList, suitableDataCalcFrom2510, oi
+            End If
             
+            
+            
+            
+            ' NEW NEW NEW from 0.16
+            ' from TT logic screen 6510
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            Dim suitableDataFrom6510 As SuitableData6510
+            
+            Dim sellerCofor As String, shipperCofor As String
+            sellerCofor = suitableDataFrom2720.vendorCofor
+            shipperCofor = suitableDataFrom2720.shipperCofor
+            Set theCorailData = theCorail.getDataFromScreen6510(plt, sellerCofor, shipperCofor)
+            Set suitableDataFrom6510 = theCorailData.getSuitableData()
+            suitableDataFrom6510.plt = CStr(plt)
+            suitableDataFrom6510.sellerCofor = CStr(sellerCofor)
+            suitableDataFrom6510.shipperCofor = CStr(shipperCofor)
+            
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
             
             
             ' more like moving data from 2510 into 2720 into coverage item object
+            ' and from 0.16 also data from 6510 (mainly tt) also into 2720
             ' ---------------------------------------------------------------------
-            dataMerge suitableDataFrom2720, suitableXtraDataFrom2720, suitableDataCalcFrom2510
+            dataMerge _
+                suitableDataFrom2720, _
+                suitableXtraDataFrom2720, _
+                suitableDataCalcFrom2510, _
+                suitableDataFrom6510
             ' ---------------------------------------------------------------------
             
-            makeLineInCoverageRep suitableDataFrom2720, repCell
+            makeLineInCoverageRep suitableDataFrom2720, repCell, hmc
             
             ' --------------------------------------------------------------
             
@@ -293,7 +357,7 @@ Private Sub doPortionOfOrdersIf(ByRef bol As Boolean, ByRef suitableDataCalcFrom
          
          For Each oi In suitableDataCalcFrom2510.getOrders()
          
-             r.Offset(0, WCOC.E_ORDER_LIST_REP_PLT) = plt
+             r.Offset(0, WCOC.E_ORDER_LIST_REP_PLT) = suitableDataCalcFrom2510.plt
              r.Offset(0, WCOC.E_ORDER_LIST_REP_PN) = oi.getElement(E_2510_PRODUCT)
              r.Offset(0, WCOC.E_ORDER_LIST_REP_SGR) = oi.getElement(E_2510_SGR_LINE)
              r.Offset(0, WCOC.E_ORDER_LIST_REP_QTY) = oi.getElement(E_2510_QTY)
@@ -319,7 +383,7 @@ Private Sub doPortionOfOrdersIf(ByRef bol As Boolean, ByRef suitableDataCalcFrom
 End Sub
 
 
-Private Sub makeLineInCoverageRep(main2720data As SuitableData2720, r As Range)
+Private Sub makeLineInCoverageRep(main2720data As SuitableData2720, r As Range, Optional mhmc As Integer)
 
 
 
@@ -332,6 +396,7 @@ Private Sub makeLineInCoverageRep(main2720data As SuitableData2720, r As Range)
     
     With theLayout
         .setLayout E_TYPE_OF_LAYOUT_WEEKLY_DEFAULT
+        .setHowManyWeeks Int(mhmc)
         .nowMergeWithDataFromCorail r, main2720data
         ' "colors" stands as symbol for how data and layout processing
         .putSomeColorsForThisPartNumber r
@@ -390,7 +455,10 @@ End Sub
 
 
 
-Private Sub dataMerge(data2720 As SuitableData2720, xtraData2720 As SuitableXtraData2720, data2510 As SuitableData2510)
+Private Sub dataMerge(data2720 As SuitableData2720, _
+    xtraData2720 As SuitableXtraData2720, _
+    data2510 As SuitableData2510, _
+    data6510 As SuitableData6510)
 
     Dim orderItemDetails As IOrderDetails, covItem As CoverageItem, xtraRqms As XtraRqmItem
     
@@ -440,6 +508,19 @@ Private Sub dataMerge(data2720 As SuitableData2720, xtraData2720 As SuitableXtra
         ' inside this sub we asign orders into covItem already
         orderItemDetails.findYourOrders data2510, covItem
     Next covItem
+    
+    
+    
+    
+    
+    
+    
+    ' here for SuitableData6510
+    ' ==================================================================
+    
+    data2720.tt = data6510.getDominantItem().getTT()
+    
+    ' ==================================================================
 End Sub
 
 

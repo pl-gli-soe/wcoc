@@ -37,10 +37,10 @@ Attribute VB_Exposed = False
 ' ---------------------------------
 
 Public DHEO As Date
-Public DHEF As Date
+Public dhef As Date
 Public DHXC As Date
 Public DHAS As Date
-Public DHRQ As Date
+Public dhrq As Date
 
 ' ---------------------------------
 

@@ -52,6 +52,7 @@ Implements ICorail
 
 Private scr2720 As ICorailScreen
 Private scr2510 As ICorailScreen
+Private scr6510 As ICorailScreen
 Private httpReqRef As HTTPRequestHandler
 
 Private theCorailData As ICorailData
@@ -61,6 +62,7 @@ Private theCorailData As ICorailData
 Private Sub Class_Initialize()
     Set scr2720 = New Corail_2720_Screen
     Set scr2510 = New Corail_2510_Screen
+    Set scr6510 = New Corail_6510_Screen
     Set httpReqRef = Nothing
     Set theCorailData = Nothing
 End Sub
@@ -68,6 +70,7 @@ End Sub
 Private Sub Class_Terminate()
     Set scr2720 = Nothing
     Set scr2510 = Nothing
+    Set scr6510 = Nothing
     
     Set httpReqRef = Nothing
     Set theCorailData = Nothing
@@ -116,8 +119,18 @@ Private Function ICorail_getDataFromScreen(pltCode As Variant, partNumber As Var
     
         scr2510.screenSetup 2510, httpReqRef
         Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, e) ' As ICorailData
+    ElseIf e = E_TYPE_OF_DATA_FROM_CORAIL_2510_CALC_WITH_FORECAST Then
+    
+        scr2510.screenSetup 2510, httpReqRef
+        Set ICorail_getDataFromScreen = scr2510.getData(pltCode, partNumber, e) ' As ICorailData
     End If
     
     ' ----------------------------------------------------------------------------------
     ' ----------------------------------------------------------------------------------
+End Function
+
+Private Function ICorail_getDataFromScreen6510(pltCode, sellerCofor As String, shipperCofor As String) As ICorailData
+    
+    scr6510.screenSetup 6510, httpReqRef
+    Set ICorail_getDataFromScreen6510 = scr6510.getDataFrom6510(pltCode, sellerCofor, shipperCofor)
 End Function

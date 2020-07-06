@@ -42,3 +42,7 @@ End Function
 Public Function getData(plt, partNumber, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 End Function
 
+
+Public Function getDataFrom6510(plt As Variant, vc1 As String, sc1 As String) As ICorailData
+End Function
+

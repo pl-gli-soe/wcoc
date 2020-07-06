@@ -64,7 +64,7 @@ Public Function getXtraRqmsStr() As String
     
     If Not xRqm Is Nothing Then
     
-        getXtraRqmsStr = xRqm.d & " " & xRqm.sgrLine & " " & xRqm.Total & Chr(10)
+        getXtraRqmsStr = xRqm.d & " " & xRqm.sgrLine & " " & xRqm.Total & chr(10)
     End If
 End Function
 

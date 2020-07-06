@@ -2,14 +2,16 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "SuitableData2510"
+Attribute VB_Name = "SuitableData6510"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+
 'The MIT License (MIT)
 '
-'Copyright (c) 2019 FORREST
+'Copyright (c) 2020 FORREST
 ' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,32 +34,75 @@ Attribute VB_Exposed = False
 
 
 
-' SUITABLE DATA FROM 2510
+' SUITABLE DATA FROM 6510
 
 
 
-Private o As OrderItem
-Private orders As Collection
+Private tt As TTItem
+Private tts As Collection
 
 Public plt As String
+Public sellerCofor As String
+Public shipperCofor As String
 
-
-
-Public Function getOrders() As Collection
-    Set getOrders = orders
+Public Function getDominantItem() As TTItem
+    
+    Set getDominantItem = Nothing
+    
+    Dim innerttitem As TTItem, counterForWinner As Integer, k As String
+    Dim slownikDoPodliczania As New Dictionary
+    For Each innerttitem In tts
+    
+    
+        
+        k = CStr(CLng(innerttitem.getTT()))
+    
+        If Not slownikDoPodliczania.Exists(CStr(CLng(innerttitem.getTT()))) Then
+            
+            slownikDoPodliczania.Add k, 1
+        Else
+            slownikDoPodliczania(k) = slownikDoPodliczania(k) + 1
+        End If
+        
+    Next innerttitem
+    
+    counterForWinner = 0
+    Dim winner As TTItem
+    For Each innerttitem In tts
+        k = CStr(CLng(innerttitem.getTT()))
+        
+        If CLng(counterForWinner) < slownikDoPodliczania(k) Then
+            Set winner = innerttitem
+            counterForWinner = Int(slownikDoPodliczania(k))
+        End If
+    Next
+    
+    If Not winner Is Nothing Then
+        Set getDominantItem = winner
+    Else
+        Set getDominantItem = New TTItem
+    End If
+    
+    
 End Function
 
 
-Public Sub addOrder(arg As OrderItem)
-    orders.Add arg
+Public Function getTTs() As Collection
+    Set getTTs = tts
+End Function
+
+
+Public Sub addTT(arg As TTItem)
+    tts.Add arg
 End Sub
 
 
 
 Private Sub Class_Initialize()
-    Set orders = New Collection
+    Set tts = New Collection
 End Sub
 
 Private Sub Class_Terminate()
-    Set orders = Nothing
+    Set tts = Nothing
 End Sub
+
