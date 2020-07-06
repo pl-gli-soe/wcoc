@@ -41,4 +41,7 @@ End Function
 Public Function getDataFromScreen(pltCode, partNumber, Optional e As E_TYPE_OF_DATA_FROM_CORAIL) As ICorailData
 End Function
 
+Public Function getDataFromScreen6510(pltCode, sellerCofor As String, shipperCofor As String) As ICorailData
+End Function
+
 

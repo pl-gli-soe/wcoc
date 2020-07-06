@@ -141,6 +141,10 @@ Private Function ICorailScreen_getData(plt As Variant, partNumber As Variant, Op
     
 End Function
 
+Private Function ICorailScreen_getDataFrom6510(plt As Variant, vc1 As String, sc1 As String) As ICorailData
+
+End Function
+
 Private Function ICorailScreen_openData(plt As Variant, partNumber As Variant) As Boolean
     ICorailScreen_openData = False
 End Function

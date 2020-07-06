@@ -82,7 +82,7 @@ Private Sub ICorailData_parseString()
     ' Debug.Print rawString
     
     
-    rawString = "<style> table tr td { padding: 4px; }</style>" & Chr(10) & rawString
+    rawString = "<style> table tr td { padding: 4px; }</style>" & chr(10) & rawString
     
     Set theDomHandler = Nothing
     Set theDomHandler = New DOMHandler

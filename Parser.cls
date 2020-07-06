@@ -38,7 +38,7 @@ Private valid As Validator
 
 Private rawCorailData As ICorailData
 
-' for 2720 and 2510
+' for 2720 and 2510 and 6510
 Private sd As Variant
 
 
@@ -77,9 +77,257 @@ Private Sub IParser_importPackageOfData(pckg As ICorailData)
         innerParse2720
     ElseIf TypeName(pckg) = "CorailDataFrom2510" Then
         innerParse2510
+    ElseIf TypeName(pckg) = "CorailDataFrom6510" Then
+        innerParse6510
     End If
 End Sub
 
+
+
+
+
+
+
+
+
+'  ____  ______     _     __
+' /'___\/\  ___\  /' \  /'__`\
+'/\ \__/\ \ \__/ /\_, \/\ \/\ \
+'\ \  _``\ \___``\/_/\ \ \ \ \ \
+' \ \ \L\ \/\ \L\ \ \ \ \ \ \_\ \
+'  \ \____/\ \____/  \ \_\ \____/
+'   \/___/  \/___/    \/_/\/___/
+'
+'
+'
+
+
+
+'
+' #################################################################################
+' #################################################################################
+Private Sub innerParse6510()
+    
+    If valid.makeSomeValidationOnImportedPackage(rawCorailData) Then
+        ' it is ok go on we working with this data
+        ' -------------------------------------------
+        
+        Dim d As ICorailData ' CorailDataFrom2510
+        Set d = rawCorailData
+        
+        
+        Set sd = New SuitableData6510
+        
+        Dim coll As Collection
+        Debug.Print "test d.getCollectionOfData().count: " & d.getCollectionOfData().Count
+        Set coll = d.getCollectionOfData()
+        
+        
+        ' c is an collection of pages
+        
+        ' !!!
+        '  -> change into dom
+        Dim stronaOrderow As Variant
+        Dim maintables As IHTMLElementCollection
+        Dim divElement As IHTMLElement
+        Dim divTempElement As IHTMLElement
+        Dim parentDivTable As IHTMLElement
+        
+        
+        Dim tds As IHTMLElementCollection, t As IHTMLTable, tc As IHTMLTableCell ' divTempElement - juz zadeklarowany i go wykorzystam tutaj
+        Dim r As HTMLTableRow
+        Dim c As HTMLTableCell
+        
+        Dim ti As TTItem
+        
+        
+        ' temps vars - really ugly - i know
+        ' --------------------------------------------------------------------------------------------------
+        ' --------------------------------------------------------------------------------------------------
+        
+        Dim tmpStrArr(WCOC.E_6510_CONSULT_ICON To WCOC.E_6510_DOCK) As String
+        
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        Dim tmpColIndxArr(WCOC.E_6510_CONSULT_ICON To WCOC.E_6510_DOCK)
+        For xx = WCOC.E_6510_CONSULT_ICON To WCOC.E_6510_DOCK
+            tmpColIndxArr(xx) = -1
+        Next xx
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        
+        Dim tmpDH_Handler As DH_Handler
+        
+        ' --------------------------------------------------------------------------------------------------
+        ' --------------------------------------------------------------------------------------------------
+        
+        
+        
+        For Each stronaOrderow In coll
+        
+        
+            francuski = False
+            angielski = False
+        
+        
+            ' every page will be treat as seperate web-page
+            d.getDom.idoc.body.innerHTML = stronaOrderow
+            d.getDom.doc.body.innerHTML = stronaOrderow
+            
+            
+            
+            Set maintables = d.getDom.idoc.getElementsByTagName("div")
+            
+            
+            ' just get first one!
+            ' ===========================================
+            For Each divElement In maintables
+            
+                If divElement.className = "ecwTableBody" Then
+                
+                    Set parentDivTable = divElement
+                    Exit For
+                End If
+            Next divElement
+            ' ===========================================
+            
+            
+
+            Set t = parentDivTable.getElementsByTagName("table")(0)
+        
+            For Each r In t.Rows
+            
+
+                Set ti = Nothing
+                
+                ' init by empty
+                ' ----------------------------------------------
+                'Dim tmpStrArr(WCOC.E_2510_CONSULT_ICON To WCOC.E_2510_UM) As String
+                For i = WCOC.E_6510_CONSULT_ICON To WCOC.E_6510_DOCK
+                    tmpStrArr(i) = ""
+                Next i
+                
+                Set tmpDH_Handler = New DH_Handler
+                ' ----------------------------------------------
+                
+                i = 1
+            
+                For Each c In r.Cells
+
+
+                    If c.tagName = "TH" Then
+                    
+                    
+                        ' catch the order of columns!!!
+                        ' ---------------------------------
+                        
+
+                        
+                        'If c.innerHTML = "DHCA" Then tmpColIndxArr(WCOC.E_2510_DHCA) = i
+                        If c.innerHTML = "DHEF" Then tmpColIndxArr(WCOC.E_6510_DHEF) = i
+                        'If c.innerHTML = "DHEO" Then tmpColIndxArr(WCOC.E_2510_DHEO) = i
+                        If c.innerHTML = "DHRQ" Then tmpColIndxArr(WCOC.E_6510_DHRQ) = i
+                        'If c.innerHTML = "DHAS" Then tmpColIndxArr(WCOC.E_2510_DHAS) = i
+                        
+                        
+                        ' ---------------------------------
+                    End If
+                    
+                    
+                    If c.tagName = "TD" Then
+                        Set divTempElement = c.getElementsByTagName("div")(0)
+                        
+
+
+                        ' DHXX here
+                        ' --------------------------------------------------------------------------
+                        
+                        'If i = tmpColIndxArr(WCOC.E_2510_DHEO) Then tmpStrArr(WCOC.E_2510_DHEO) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_6510_DHEF) Then
+                            tmpStrArr(WCOC.E_6510_DHEF) = CStr(divTempElement.innerHTML)
+                            Set tmpDH_Handler = Nothing
+                            Set tmpDH_Handler = New DH_Handler
+                            
+                            If checkIfDateAndTime(tmpStrArr(WCOC.E_6510_DHEF)) Then
+                                tmpDH_Handler.dhef = parseStringToDateTime(tmpStrArr(WCOC.E_6510_DHEF))
+                            End If
+                            
+                            Set ti = Nothing
+                            Set ti = New TTItem
+                            
+                            
+                        End If
+                        'If i = tmpColIndxArr(WCOC.E_2510_DHAS) Then tmpStrArr(WCOC.E_2510_DHAS) = CStr(divTempElement.innerHTML)
+                        If i = tmpColIndxArr(WCOC.E_6510_DHRQ) Then
+                            tmpStrArr(WCOC.E_6510_DHRQ) = CStr(divTempElement.innerHTML)
+                            'Set tmpDH_Handler = Nothing
+                            'Set tmpDH_Handler = New DH_Handler
+                            
+                            If checkIfDateAndTime(tmpStrArr(WCOC.E_6510_DHRQ)) Then
+                                tmpDH_Handler.dhrq = parseStringToDateTime(tmpStrArr(WCOC.E_6510_DHRQ))
+                            End If
+                            
+                            
+                            With ti
+                                .dhConstructor tmpDH_Handler
+                                .calc
+                            End With
+                        End If
+                        
+                        
+                        
+                        ' --------------------------------------------------------------------------
+
+                            
+                        
+                        'Dim qtyAsDouble As Double
+                        'qtyAsDouble = 0
+                        'On Error Resume Next
+                        'qtyAsDouble = CDbl(forceStringToBeDouble(tmpStrArr(WCOC.E_2510_QTY)))
+                        
+                        'With oItem
+                        '    .coforConstructor tmpStrArr(WCOC.E_2510_SELLER), tmpStrArr(WCOC.E_2510_SHIPPER)
+                        '    .dhConstructor tmpDH_Handler
+                        '    .commonConstructor tmpStrArr, CDbl(qtyAsDouble)
+                        'End With
+                            
+                        
+                        '
+                        ''
+                        ' ==========================================================================
+                        ' ==========================================================================
+                    End If
+                    
+                    i = i + 1
+                Next c
+                
+                
+                
+                If Not ti Is Nothing Then
+                    If CLng(ti.getTT()) <> 0 Then
+                        sd.addTT ti
+                    End If
+                End If
+                
+                
+            Next r
+            
+            
+            
+            ' robimy tylko pierwsza strone!
+            Exit For
+        
+
+        Next stronaOrderow
+        
+        
+        
+        ' -------------------------------------------
+    Else
+        MsgBox "Wrong type of package!"
+    End If
+End Sub
+'
+'
+' #################################################################################
 
 
 
@@ -330,7 +578,7 @@ Private Sub innerParse2510()
                             End If
                             
                             If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHEF)) Then
-                                tmpDH_Handler.DHEF = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEF), CBool(francuski))
+                                tmpDH_Handler.dhef = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHEF), CBool(francuski))
                             End If
                             
                             
@@ -339,7 +587,7 @@ Private Sub innerParse2510()
                             End If
                             
                             If checkIfDateAndTime(tmpStrArr(WCOC.E_2510_DHRQ)) Then
-                                tmpDH_Handler.DHRQ = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHRQ), CBool(francuski))
+                                tmpDH_Handler.dhrq = parseStringToDateTime(tmpStrArr(WCOC.E_2510_DHRQ), CBool(francuski))
                             End If
                             
                             
@@ -554,11 +802,56 @@ Private Sub innerParse2720()
             ' ---------------------------------------------------------------------
             
             
-            ' suitable data
+            ' suitable data recv
             ' ---------------------------------------------------------------------
             Set inputElement = d.getDom.idoc.getElementById("receivedOnSite")
             sd.recv = CDbl(forceStringToBeDouble(CStr(inputElement.Value)))
             ' ---------------------------------------------------------------------
+            
+            
+            ' suitable data Hazards from FJU
+            ' ---------------------------------------------------------------------
+            Set inputElement = d.getDom.idoc.getElementById("aleatoriesSinceFJU")
+            sd.hazardsFromFJU = CDbl(forceStringToBeDouble(CStr(inputElement.Value)))
+            ' ---------------------------------------------------------------------
+            
+            
+            
+            
+            ' suitable data Blockages in progress
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            ' name = currentBlockingCount
+            
+            Dim cbcColl As IHTMLElementCollection
+            Set cbcColl = Nothing
+            
+            On Error Resume Next
+            Set cbcColl = d.getDom.idoc.getElementsByName("currentBlockingCount")
+            
+            If Not cbcColl Is Nothing Then
+                For Each el In cbcColl
+                
+                    Set inputElement = el
+                    If Not inputElement Is Nothing Then
+                        If inputElement.outerHTML Like "*currentBlockingCount*" Then
+                            
+                            sd.blockagesInProgress = CDbl(forceStringToBeDouble(CStr(inputElement.Value)))
+                            Exit For
+                        End If
+                    End If
+                    
+                    
+                Next el
+                       
+            
+            End If
+            
+            ' ---------------------------------------------------------------------
+            ' ---------------------------------------------------------------------
+            
+            
+            
             
             
             ' suitable data for cofors
@@ -839,6 +1132,9 @@ End Sub
 
 
 
+
+
+
 Private Function parseStringToDate(strD) As Date
     
     ' format MM/DD/YYYY
@@ -863,14 +1159,14 @@ Private Function parseStringToDate(strD) As Date
     
     End If
     
-    Dim S As String
-    S = Format(y & "-" & m & "-" & d, "yyyy-mm-dd")
+    Dim s As String
+    s = Format(y & "-" & m & "-" & d, "yyyy-mm-dd")
     
-    parseStringToDate = CDate(CStr(S))
+    parseStringToDate = CDate(CStr(s))
     
 End Function
 
-Private Function parseStringToDateTime(strDT, isFrance As Boolean) As Date
+Private Function parseStringToDateTime(strDT, Optional isFrance As Boolean) As Date
     
     
     ' angielski
@@ -898,63 +1194,87 @@ Private Function parseStringToDateTime(strDT, isFrance As Boolean) As Date
     
     
 
+    If Len(strDT) = 14 Then
     
     
-
-    If IsNumeric(Left(strDT, 2)) Then
-        d1 = Int(Left(strDT, 2))
-    End If
+        If IsNumeric(Left(strDT, 2)) Then
+            d1 = Int(Left(strDT, 2))
+        End If
     
-    If IsNumeric(Mid(strDT, 4, 2)) Then
-        m1 = Int(Mid(strDT, 4, 2))
-    End If
-    
-    If IsNumeric(Mid(strDT, 7, 2)) Then
-        y1 = Int(Mid(strDT, 7, 2))
-    End If
-    
-    If IsNumeric(Left(strDT, 2)) Then
-        y2 = Int(Left(strDT, 2))
-    End If
-    
-    If IsNumeric(Mid(strDT, 4, 2)) Then
-        m2 = Int(Mid(strDT, 4, 2))
-    End If
-    
-    If IsNumeric(Mid(strDT, 7, 2)) Then
-        d2 = Int(Mid(strDT, 7, 2))
-    End If
-    
-    If IsNumeric(Mid(strDT, 10, 2)) Then
-        hh = Int(Mid(strDT, 10, 2))
-    End If
-    
-    If IsNumeric(Mid(strDT, 13, 2)) Then
-        mm = Int(Mid(strDT, 13, 2))
-    End If
+        If IsNumeric(Mid(strDT, 4, 2)) Then
+            m1 = Int(Mid(strDT, 4, 2))
+        End If
         
-    
-
+        If IsNumeric(Mid(strDT, 7, 2)) Then
+            y1 = Int(Mid(strDT, 7, 2))
+        End If
+        
+        If IsNumeric(Left(strDT, 2)) Then
+            y2 = Int(Left(strDT, 2))
+        End If
+        
+        If IsNumeric(Mid(strDT, 4, 2)) Then
+            m2 = Int(Mid(strDT, 4, 2))
+        End If
+        
+        If IsNumeric(Mid(strDT, 7, 2)) Then
+            d2 = Int(Mid(strDT, 7, 2))
+        End If
+        
+        If IsNumeric(Mid(strDT, 10, 2)) Then
+            hh = Int(Mid(strDT, 10, 2))
+        End If
+        
+        If IsNumeric(Mid(strDT, 13, 2)) Then
+            mm = Int(Mid(strDT, 13, 2))
+        End If
+        
     ' prototypowa logika sprawdzajaca, czy wygenerowana data jest w miare blisko daty dzisiejszej
     '
     
-    Dim S1 As String, S2 As String
-    Dim SD1 As Date, SD2 As Date
+        Dim S1 As String, S2 As String
+        Dim SD1 As Date, SD2 As Date
+        
+        S1 = Format(y1 & "-" & m1 & "-" & d1 & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
+        S2 = Format(y2 & "-" & m2 & "-" & d2 & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
+        
+        SD1 = CDate(S1)
+        SD2 = CDate(S2)
+        
+        diff1 = Math.Abs(dzis - SD1)
+        diff2 = Math.Abs(dzis - SD2)
+        
+        If diff1 < diff2 Then
+            parseStringToDateTime = CDate(CStr(SD1))
+        Else
+            parseStringToDateTime = CDate(CStr(SD2))
+        End If
+        
+    ElseIf Len(strDT) = 16 Then
     
-    S1 = Format(y1 & "-" & m1 & "-" & d1 & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
-    S2 = Format(y2 & "-" & m2 & "-" & d2 & " " & hh & ":" & mm, "yy-mm-dd hh:mm")
     
-    SD1 = CDate(S1)
-    SD2 = CDate(S2)
+        If IsNumeric(Left(strDT, 2)) Then
+            d1 = Int(Left(strDT, 2))
+        End If
     
-    diff1 = Math.Abs(dzis - SD1)
-    diff2 = Math.Abs(dzis - SD2)
+        If IsNumeric(Mid(strDT, 4, 2)) Then
+            m1 = Int(Mid(strDT, 4, 2))
+        End If
+        
+        If IsNumeric(Mid(strDT, 7, 4)) Then
+            y1 = Int(Mid(strDT, 7, 4))
+        End If
+        
+        
+        Dim d16size As Date
+        d16size = Date
+        d16size = CDate(Format(y1 & "-" & m1 & "-" & d1, "yyyy-mm-dd"))
+        parseStringToDateTime = CDate(d16size)
+        
     
-    If diff1 < diff2 Then
-        parseStringToDateTime = CDate(CStr(SD1))
-    Else
-        parseStringToDateTime = CDate(CStr(SD2))
     End If
+        
+
     
 End Function
 
@@ -977,12 +1297,12 @@ Private Function checkIfDateAndTime(strDT) As Boolean
 
     checkIfDateAndTime = False
     
-    If Len(strDT) = 14 Then
+    If Len(strDT) = 14 Or Len(strDT) = 16 Then
     
         If Mid(strDT, 3, 1) = "/" Then
             If Mid(strDT, 6, 1) = "/" Then
-                If Mid(strDT, 9, 1) = " " Then
-                    If Mid(strDT, 12, 1) = ":" Then
+                If Mid(strDT, 9, 1) = " " Or Mid(strDT, 11, 1) = " " Then
+                    If Mid(strDT, 12, 1) = ":" Or Mid(strDT, 14, 1) = ":" Then
                         checkIfDateAndTime = True
                     End If
                 End If
@@ -998,10 +1318,38 @@ Private Function forceStringToBeDouble(arg As String) As Double
     Dim convertedValue As String
     convertedValue = CStr(arg)
     ' double sure shot! :D
+    
+    ' just in case, if empty then change to string "0"
+    If Trim(convertedValue) = "" Then
+        convertedValue = "0"
+    End If
+    
+    
     convertedValue = Replace(convertedValue, ",", Application.DecimalSeparator)
     convertedValue = Replace(convertedValue, ".", Application.DecimalSeparator)
     
+    On Error Resume Next
     forceStringToBeDouble = CDbl(convertedValue)
+    
+    If CStr(convertedValue) <> "0" And forceStringToBeDouble = 0 Then
+    
+        ' forceStringToBeDouble = convertedValue
+        
+        If Left(convertedValue, 1) = "-" Then
+        
+            convertedValue = Mid(convertedValue, 2, Len(convertedValue) - 3)
+            forceStringToBeDouble = Int(convertedValue) * (-1)
+            
+        
+        Else
+        
+            convertedValue = Mid(convertedValue, 1, Len(convertedValue) - 2)
+            forceStringToBeDouble = CDbl(convertedValue)
+        
+        End If
+    End If
+    
+    
 End Function
 
 

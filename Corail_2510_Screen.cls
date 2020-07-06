@@ -249,7 +249,7 @@ Private Function isThereStillSthToParse(answer) As Boolean
     
     
     
-    firstLine = Split(answer, Chr(10))(0)
+    firstLine = Split(answer, chr(10))(0)
     
     arr = Split(firstLine, " ")
     
@@ -262,7 +262,7 @@ Private Function isThereStillSthToParse(answer) As Boolean
         If CStr(arr(x)) Like "numberOfElement=*" Then
         
             tmp = Split(arr(x), "=")(1)
-            tmp = Replace(tmp, Chr(34), "")
+            tmp = Replace(tmp, chr(34), "")
             newVal = CLng(tmp)
             numberOfElements = newVal
             ' Exit For
@@ -271,7 +271,7 @@ Private Function isThereStillSthToParse(answer) As Boolean
         If CStr(arr(x)) Like "pageSize=*" Then
         
             tmp = Split(arr(x), "=")(1)
-            tmp = Replace(tmp, Chr(34), "")
+            tmp = Replace(tmp, chr(34), "")
             newVal = Int(tmp)
             currentPageSize = newVal
             ' Exit For
@@ -280,7 +280,7 @@ Private Function isThereStillSthToParse(answer) As Boolean
         If CStr(arr(x)) Like "indicePage=*" Then
         
             tmp = Split(arr(x), "=")(1)
-            tmp = Replace(tmp, Chr(34), "")
+            tmp = Replace(tmp, chr(34), "")
             newVal = Int(tmp)
             currentPage = newVal
             ' Exit For
@@ -288,7 +288,7 @@ Private Function isThereStillSthToParse(answer) As Boolean
         
         If CStr(arr(x)) Like "numberOfPage=*" Then
             tmp = Split(arr(x), "=")(1)
-            tmp = Replace(tmp, Chr(34), "")
+            tmp = Replace(tmp, chr(34), "")
             tmp = Replace(tmp, "-->", "")
             newVal = Int(tmp)
             pages = newVal
@@ -460,6 +460,10 @@ Function parseFromDate(i As Integer)
     
     
     
+End Function
+
+Private Function ICorailScreen_getDataFrom6510(plt As Variant, vc1 As String, sc1 As String) As ICorailData
+
 End Function
 
 Private Function ICorailScreen_openData(plt As Variant, partNumber As Variant) As Boolean

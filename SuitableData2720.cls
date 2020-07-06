@@ -58,6 +58,15 @@ Public manufacturerCofor As String
 Public supplierName As String
 
 
+' extra fields
+Public hazardsFromFJU As Double
+Public blockagesInProgress As Double
+
+
+' new param: TT
+Public tt As Double
+
+
 Private item As CoverageItem
 Private collectionOfCovLines As Collection
 

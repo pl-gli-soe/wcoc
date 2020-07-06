@@ -37,18 +37,43 @@ Attribute VB_Name = "mainModule"
 'SOFTWARE.
 
 
+Public Sub hardReset()
+
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.Calculate
+End Sub
+
+
 Public Sub onClick()
     
     LoginForm.show
 End Sub
 
-Public Sub main(login As String, pass As String, xtraOrderList As Boolean)
+Public Sub main(me1 As LoginForm)
+
+    
+    Dim login As String
+    Dim pass As String
+    Dim xtraOrderList As Boolean
+    Dim forecast As Boolean
+    Dim howManyWeeks As Integer
+    
+    login = CStr(me1.TextBoxLogin.Value)
+    pass = CStr(me1.TextBoxPass.Value)
+    xtraOrderList = CBool(me1.CheckBoxOrderList.Value)
+    forecast = CBool(me1.CheckBoxForecast.Value)
+    
+    howManyWeeks = Int(me1.LabelWeeks.Caption)
+
+    Application.ScreenUpdating = False
     
     Dim cov As ICoverage
     
     Set cov = New WeeklyCoverage
-    cov.runCoverage CStr(login), CStr(pass), CBool(xtraOrderList)
+    cov.runCoverage CStr(login), CStr(pass), CBool(xtraOrderList), CBool(forecast), Int(howManyWeeks)
     
     
+    Application.ScreenUpdating = True
     MsgBox "ready!", vbInformation
 End Sub

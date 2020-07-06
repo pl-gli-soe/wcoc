@@ -2,15 +2,17 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "DOMHandler"
+Attribute VB_Name = "TTItem"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+
 'The MIT License (MIT)
 '
-'Copyright (c) 2019 FORREST
-' Mateusz Milewski mateusz.milewski@opel.com aka FORREST
+'Copyright (c) 2020 FORREST
+' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -31,24 +33,73 @@ Attribute VB_Exposed = False
 'SOFTWARE.
 
 
+Private tt As Double
+Private ttInWeeks As Double
+Private dhIsReady As Boolean
+' milestones dates
+Private DH As DH_Handler
 
 
-Public i As HTMLInputElement
-
-Public inputButton As HTMLInputButtonElement
-Public button As HTMLButtonElement
-
-Public a As HTMLAnchorElement
-Public s As HTMLSelectElement
-
-Public elementCollection As HTMLElementCollection
-Public iElementCollection As IHTMLElementCollection
-
-Public idoc As IHTMLDocument
-Public doc As HTMLDocument
-
-Public iElement As IHTMLElement
-Public table As HTMLTable
+Public Sub calc()
 
 
 
+
+    tt = 0#
+    
+    
+    Dim mainDiff As Double
+    
+    mainDiff = (DH.dhrq - DH.dhef)
+    
+    tt = CDbl(mainDiff)
+    ttInWeeks = CDbl(tt / 7#)
+    
+    Debug.Print "inside tt item, calc: " & tt & " , " & ttInWeeks
+    
+End Sub
+
+Public Function getTT() As Double
+    getTT = CDbl(tt)
+End Function
+
+Public Sub dhConstructor(mDH As DH_Handler)
+
+
+    Set DH = mDH
+    dhIsReady = True
+
+End Sub
+
+Private Sub Class_Initialize()
+    Set DH = New DH_Handler
+    dhIsReady = False
+End Sub
+
+Private Sub Class_Terminate()
+    Set DH = Nothing
+    dhIsReady = False
+End Sub
+
+
+
+
+Public Function getElement(whichElement As E_6510_ELEMENT) As Variant
+
+    
+    
+    Select Case whichElement
+        Case E_6510_DHEF
+            getElement = CStr(DH.dhef)
+            
+        Case E_6510_DHRQ
+            getElement = DH.dhrq
+            
+        Case Else
+            MsgBox "This element is not exist!"
+            End
+            
+    End Select
+    
+    
+End Function

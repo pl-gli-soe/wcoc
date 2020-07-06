@@ -139,13 +139,13 @@ Public Function getElement(whichElement As E_2510_ELEMENT) As Variant
             getElement = DH.DHAS
             
         Case E_2510_ELEMENT.E_2510_DHEF
-            getElement = DH.DHEF
+            getElement = DH.dhef
             
         Case E_2510_ELEMENT.E_2510_DHEO
             getElement = DH.DHEO
             
         Case E_2510_ELEMENT.E_2510_DHRQ
-            getElement = DH.DHRQ
+            getElement = DH.dhrq
             
             
         Case E_2510_ELEMENT.E_2510_DN
